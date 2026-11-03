@@ -1,0 +1,352 @@
+{
+  "idea": "Recuperação de carrinho abandonado: lembrar compradores que deixaram itens no carrinho com um e-mail no momento certo e um caminho fácil de volta ao checkout.",
+  "language": "pt-BR",
+  "prd": {
+    "title": "Recuperação de carrinho abandonado",
+    "problem": "Muitos compradores colocam itens no carrinho e saem sem pagar. A loja não faz nenhum acompanhamento, então clientes interessados são perdidos, e um acompanhamento agressivo demais pode incomodá-los e violar regras de consentimento.",
+    "personas": [
+      "Comprador indeciso: deixou itens no carrinho e pode voltar se for lembrado no momento certo",
+      "Gerente de e-commerce: quer recuperar receita sem prejudicar a marca"
+    ],
+    "goals": [
+      "Recuperar uma parcela mensurável dos carrinhos abandonados",
+      "Manter os lembretes relevantes, em número limitado e fáceis de cancelar"
+    ],
+    "success_metrics": [
+      "Taxa de carrinhos recuperados (carrinhos abandonados que terminam em pedido pago): aumentar (linha de base não informada)",
+      "Taxa de descadastro dos e-mails de lembrete: manter baixa (limite não informado)"
+    ],
+    "scope_in": [
+      "E-mail de lembrete depois que o carrinho é abandonado",
+      "Um lembrete de acompanhamento",
+      "Link que restaura o carrinho",
+      "Regras de descadastro e de parada após a compra"
+    ],
+    "scope_out": [
+      "Lembretes por SMS ou push",
+      "Ofertas de desconto personalizadas"
+    ],
+    "requirements": [
+      "O sistema deve enviar um e-mail de lembrete ao comprador autenticado que abandonou um carrinho",
+      "O sistema deve enviar no máximo um lembrete de acompanhamento",
+      "O sistema deve restaurar o conteúdo do carrinho quando o comprador seguir o link do e-mail",
+      "O sistema deve interromper os lembretes quando o comprador concluir uma compra",
+      "O sistema deve respeitar o pedido de descadastro em todo lembrete"
+    ],
+    "risks": [
+      "Regras de privacidade e consentimento para e-mail de marketing - mitigação: enviar apenas a compradores que aceitaram comunicações, com descadastro em um clique",
+      "Itens esgotados quando o comprador volta - mitigação: informar quais itens deixaram de estar disponíveis"
+    ],
+    "assumptions": [
+      "Premissa: um carrinho é considerado abandonado após 1 hora sem checkout; a ideia não define isso",
+      "Premissa: só compradores autenticados podem ser alcançados, pois a loja tem o e-mail deles"
+    ],
+    "open_questions": [
+      "Qual é o tempo de espera certo antes do primeiro lembrete?",
+      "Que registro de consentimento a loja mantém para e-mail de marketing?"
+    ]
+  },
+  "stories": [
+    {
+      "id": "S1",
+      "epic": "E-mails de lembrete",
+      "title": "Enviar lembrete após o abandono do carrinho",
+      "as_a": "comprador indeciso",
+      "i_want": "receber um e-mail me lembrando dos itens que deixei no carrinho",
+      "so_that": "possa concluir a compra sem procurar tudo de novo",
+      "priority": "Must",
+      "points": 5,
+      "prd_ref": "requirements: enviar e-mail de lembrete ao comprador autenticado",
+      "scenarios": [
+        {
+          "name": "O lembrete é enviado após o tempo de espera",
+          "given": [
+            "um comprador autenticado que aceitou e-mails deixou itens no carrinho"
+          ],
+          "when": [
+            "uma hora passa sem checkout"
+          ],
+          "then": [
+            "o comprador recebe um lembrete com os itens deixados no carrinho"
+          ]
+        },
+        {
+          "name": "Sem consentimento, sem lembrete",
+          "given": [
+            "um comprador autenticado que não aceitou e-mails de marketing deixou itens no carrinho"
+          ],
+          "when": [
+            "uma hora passa sem checkout"
+          ],
+          "then": [
+            "nenhum lembrete é enviado"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S2",
+      "epic": "E-mails de lembrete",
+      "title": "Enviar um acompanhamento após 24 horas",
+      "as_a": "gerente de e-commerce",
+      "i_want": "um único lembrete de acompanhamento 24 horas após o primeiro, quando o carrinho continua aberto",
+      "so_that": "mais compradores voltem sem serem contatados em excesso",
+      "priority": "Should",
+      "points": 3,
+      "prd_ref": "requirements: enviar no máximo um lembrete de acompanhamento",
+      "scenarios": [
+        {
+          "name": "O acompanhamento é enviado uma vez",
+          "given": [
+            "um comprador recebeu o primeiro lembrete e não comprou"
+          ],
+          "when": [
+            "24 horas se passam"
+          ],
+          "then": [
+            "o comprador recebe um lembrete de acompanhamento"
+          ]
+        },
+        {
+          "name": "Não há terceiro lembrete",
+          "given": [
+            "um comprador recebeu o lembrete e o acompanhamento e não comprou"
+          ],
+          "when": [
+            "mais tempo passa"
+          ],
+          "then": [
+            "nenhum outro lembrete é enviado"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S3",
+      "epic": "E-mails de lembrete",
+      "title": "Restaurar meu carrinho pelo link do e-mail",
+      "as_a": "comprador indeciso",
+      "i_want": "voltar a um carrinho já com meus itens ao seguir o link do e-mail",
+      "so_that": "possa ir direto ao checkout",
+      "priority": "Must",
+      "points": 5,
+      "prd_ref": "requirements: restaurar o conteúdo do carrinho",
+      "scenarios": [
+        {
+          "name": "O carrinho é restaurado",
+          "given": [
+            "um comprador recebeu um lembrete de um carrinho com dois itens"
+          ],
+          "when": [
+            "o comprador segue o link"
+          ],
+          "then": [
+            "o carrinho mostra os mesmos dois itens",
+            "o comprador pode seguir para o checkout"
+          ]
+        },
+        {
+          "name": "Itens indisponíveis são explicados",
+          "given": [
+            "um dos dois itens está esgotado"
+          ],
+          "when": [
+            "o comprador segue o link"
+          ],
+          "then": [
+            "o carrinho contém o item disponível",
+            "o comprador é informado de qual item deixou de estar disponível"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S4",
+      "epic": "Controle do cliente",
+      "title": "Descadastrar-me dos lembretes",
+      "as_a": "comprador indeciso",
+      "i_want": "parar de receber lembretes de carrinho com um clique em qualquer lembrete",
+      "so_that": "minha escolha seja respeitada imediatamente",
+      "priority": "Must",
+      "points": 2,
+      "prd_ref": "requirements: respeitar o pedido de descadastro",
+      "scenarios": [
+        {
+          "name": "O descadastro vale imediatamente",
+          "given": [
+            "um comprador recebeu um lembrete"
+          ],
+          "when": [
+            "o comprador usa o link de descadastro"
+          ],
+          "then": [
+            "o comprador recebe a confirmação de descadastro",
+            "nenhum outro lembrete de carrinho é enviado"
+          ]
+        },
+        {
+          "name": "O acompanhamento pendente é cancelado",
+          "given": [
+            "um comprador recebeu o primeiro lembrete e tem um acompanhamento agendado"
+          ],
+          "when": [
+            "o comprador se descadastra"
+          ],
+          "then": [
+            "o acompanhamento agendado não é enviado"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S5",
+      "epic": "Controle do cliente",
+      "title": "Parar os lembretes após a compra",
+      "as_a": "comprador indeciso",
+      "i_want": "que os lembretes parem assim que eu concluir meu pedido",
+      "so_that": "não seja incomodado por algo que já comprei",
+      "priority": "Should",
+      "points": 3,
+      "prd_ref": "requirements: interromper os lembretes quando o comprador concluir uma compra",
+      "scenarios": [
+        {
+          "name": "O lembrete para após a compra",
+          "given": [
+            "um comprador recebeu o primeiro lembrete"
+          ],
+          "when": [
+            "o comprador conclui o pedido antes do acompanhamento"
+          ],
+          "then": [
+            "o acompanhamento não é enviado"
+          ]
+        },
+        {
+          "name": "Compra parcial mantém o restante",
+          "given": [
+            "um comprador deixou três itens e comprou um deles"
+          ],
+          "when": [
+            "chega a hora do acompanhamento"
+          ],
+          "then": [
+            "o acompanhamento lista apenas os dois itens restantes"
+          ]
+        }
+      ]
+    }
+  ],
+  "reviews": [
+    {
+      "story_id": "S1",
+      "scores": {
+        "independent": 2,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 1,
+        "small": 2,
+        "testable": 2
+      },
+      "verdict": "pass",
+      "comment": "Estimável: o tempo de espera do abandono é uma pergunta em aberto no PRD; a estimativa assume uma hora.",
+      "rewrite": null,
+      "scores_after": null
+    },
+    {
+      "story_id": "S2",
+      "scores": {
+        "independent": 2,
+        "negotiable": 1,
+        "valuable": 1,
+        "estimable": 2,
+        "small": 2,
+        "testable": 0
+      },
+      "verdict": "rewrite",
+      "comment": "Original: 'Como gerente, quero lembretes enviados na hora certa, para que as vendas aumentem' (3 pontos). 'Hora certa' não é testável; reescrita com o único acompanhamento após 24 horas que o PRD exige.",
+      "rewrite": {
+        "id": "S2",
+        "epic": "E-mails de lembrete",
+        "title": "Enviar um acompanhamento após 24 horas",
+        "as_a": "gerente de e-commerce",
+        "i_want": "um único lembrete de acompanhamento 24 horas após o primeiro, quando o carrinho continua aberto",
+        "so_that": "mais compradores voltem sem serem contatados em excesso",
+        "priority": "Should",
+        "points": 3,
+        "prd_ref": "requirements: enviar no máximo um lembrete de acompanhamento",
+        "scenarios": []
+      },
+      "scores_after": {
+        "independent": 2,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 1,
+        "small": 2,
+        "testable": 2
+      }
+    },
+    {
+      "story_id": "S3",
+      "scores": {
+        "independent": 1,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 1,
+        "small": 0,
+        "testable": 2
+      },
+      "verdict": "rewrite",
+      "comment": "Original: restaurar o carrinho, tratar estoque, preços e cupons (8 pontos, mais que uma sprint com as regras de estoque). Preços e cupons foram cortados; o comprador é avisado de quais itens estão indisponíveis.",
+      "rewrite": {
+        "id": "S3",
+        "epic": "E-mails de lembrete",
+        "title": "Restaurar meu carrinho pelo link do e-mail",
+        "as_a": "comprador indeciso",
+        "i_want": "voltar a um carrinho já com meus itens ao seguir o link do e-mail",
+        "so_that": "possa ir direto ao checkout",
+        "priority": "Must",
+        "points": 5,
+        "prd_ref": "requirements: restaurar o conteúdo do carrinho",
+        "scenarios": []
+      },
+      "scores_after": {
+        "independent": 2,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 1,
+        "small": 2,
+        "testable": 2
+      }
+    },
+    {
+      "story_id": "S4",
+      "scores": {
+        "independent": 2,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 2,
+        "small": 2,
+        "testable": 2
+      },
+      "verdict": "pass",
+      "comment": "Pequena e testável; nada a apontar. Verificar se o link de descadastro também funciona aberto em outro dispositivo.",
+      "rewrite": null,
+      "scores_after": null
+    },
+    {
+      "story_id": "S5",
+      "scores": {
+        "independent": 1,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 2,
+        "small": 2,
+        "testable": 2
+      },
+      "verdict": "pass",
+      "comment": "Independente: depende da agenda de lembretes de S1 e S2, mas pode ser testada com a agenda simulada.",
+      "rewrite": null,
+      "scores_after": null
+    }
+  ]
+}

@@ -1,0 +1,352 @@
+{
+  "idea": "Abandoned cart recovery: remind shoppers who left items in their cart with a timely email and an easy way back to checkout.",
+  "language": "en",
+  "prd": {
+    "title": "Abandoned cart recovery",
+    "problem": "Many shoppers add items to the cart and leave without paying. The store has no follow-up, so interested customers are lost, and any follow-up that is too aggressive risks annoying them and breaching consent rules.",
+    "personas": [
+      "Hesitant shopper: left items in the cart and may return if reminded at the right moment",
+      "E-commerce manager: wants to recover revenue without damaging the brand"
+    ],
+    "goals": [
+      "Recover a measurable share of abandoned carts",
+      "Keep reminders relevant, limited in number and easy to opt out of"
+    ],
+    "success_metrics": [
+      "Recovered cart rate (abandoned carts that end in a paid order): increase (baseline not provided)",
+      "Unsubscribe rate from reminder emails: stay low (threshold not provided)"
+    ],
+    "scope_in": [
+      "Reminder email after a cart is abandoned",
+      "One follow-up reminder",
+      "Link that restores the cart",
+      "Unsubscribe and stop-on-purchase rules"
+    ],
+    "scope_out": [
+      "SMS or push reminders",
+      "Personalized discount offers"
+    ],
+    "requirements": [
+      "The system must send a reminder email to a signed-in shopper who abandoned a cart",
+      "The system must send at most one follow-up reminder",
+      "The system must restore the cart contents when the shopper follows the email link",
+      "The system must stop reminders once the shopper completes a purchase",
+      "The system must honour an unsubscribe request in every reminder"
+    ],
+    "risks": [
+      "Privacy and consent rules for marketing email - mitigation: send only to shoppers who accepted communications, with one-click unsubscribe",
+      "Items out of stock when the shopper returns - mitigation: tell the shopper which items are no longer available"
+    ],
+    "assumptions": [
+      "Assumption: a cart counts as abandoned after 1 hour without checkout; the idea does not define it",
+      "Assumption: only signed-in shoppers can be reached, because the store has their email"
+    ],
+    "open_questions": [
+      "What is the right waiting time before the first reminder?",
+      "Which consent record does the store keep for marketing email?"
+    ]
+  },
+  "stories": [
+    {
+      "id": "S1",
+      "epic": "Reminder emails",
+      "title": "Send a reminder after cart abandonment",
+      "as_a": "hesitant shopper",
+      "i_want": "to receive one email reminding me of the items I left in my cart",
+      "so_that": "I can finish the purchase without searching again",
+      "priority": "Must",
+      "points": 5,
+      "prd_ref": "requirements: send a reminder email to a signed-in shopper",
+      "scenarios": [
+        {
+          "name": "Reminder is sent after the waiting time",
+          "given": [
+            "a signed-in shopper who accepted emails left items in the cart"
+          ],
+          "when": [
+            "one hour passes without checkout"
+          ],
+          "then": [
+            "the shopper receives a reminder listing the items left in the cart"
+          ]
+        },
+        {
+          "name": "No reminder without consent",
+          "given": [
+            "a signed-in shopper who did not accept marketing emails left items in the cart"
+          ],
+          "when": [
+            "one hour passes without checkout"
+          ],
+          "then": [
+            "no reminder is sent"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S2",
+      "epic": "Reminder emails",
+      "title": "Send one follow-up after 24 hours",
+      "as_a": "e-commerce manager",
+      "i_want": "a single follow-up reminder 24 hours after the first one when the cart is still open",
+      "so_that": "more shoppers come back without being over-contacted",
+      "priority": "Should",
+      "points": 3,
+      "prd_ref": "requirements: send at most one follow-up reminder",
+      "scenarios": [
+        {
+          "name": "Follow-up is sent once",
+          "given": [
+            "a shopper received a first reminder and did not buy"
+          ],
+          "when": [
+            "24 hours pass"
+          ],
+          "then": [
+            "the shopper receives one follow-up reminder"
+          ]
+        },
+        {
+          "name": "No third reminder",
+          "given": [
+            "a shopper received a reminder and a follow-up and did not buy"
+          ],
+          "when": [
+            "more time passes"
+          ],
+          "then": [
+            "no further reminder is sent"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S3",
+      "epic": "Reminder emails",
+      "title": "Restore my cart from the email link",
+      "as_a": "hesitant shopper",
+      "i_want": "to return to a cart with my items already in it when I follow the email link",
+      "so_that": "I can go straight to checkout",
+      "priority": "Must",
+      "points": 5,
+      "prd_ref": "requirements: restore the cart contents",
+      "scenarios": [
+        {
+          "name": "Cart is restored",
+          "given": [
+            "a shopper received a reminder for a cart with two items"
+          ],
+          "when": [
+            "the shopper follows the link"
+          ],
+          "then": [
+            "the cart shows the same two items",
+            "the shopper can proceed to checkout"
+          ]
+        },
+        {
+          "name": "Unavailable items are explained",
+          "given": [
+            "one of the two items is now out of stock"
+          ],
+          "when": [
+            "the shopper follows the link"
+          ],
+          "then": [
+            "the cart contains the available item",
+            "the shopper is told which item is no longer available"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S4",
+      "epic": "Customer control",
+      "title": "Unsubscribe from reminders",
+      "as_a": "hesitant shopper",
+      "i_want": "to stop receiving cart reminders with one click from any reminder",
+      "so_that": "my choice is respected immediately",
+      "priority": "Must",
+      "points": 2,
+      "prd_ref": "requirements: honour an unsubscribe request",
+      "scenarios": [
+        {
+          "name": "Unsubscribe takes effect immediately",
+          "given": [
+            "a shopper received a reminder"
+          ],
+          "when": [
+            "the shopper uses the unsubscribe link"
+          ],
+          "then": [
+            "the shopper is confirmed as unsubscribed",
+            "no further cart reminders are sent"
+          ]
+        },
+        {
+          "name": "Pending follow-up is cancelled",
+          "given": [
+            "a shopper received a first reminder and has a follow-up scheduled"
+          ],
+          "when": [
+            "the shopper unsubscribes"
+          ],
+          "then": [
+            "the scheduled follow-up is not sent"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S5",
+      "epic": "Customer control",
+      "title": "Stop reminders after purchase",
+      "as_a": "hesitant shopper",
+      "i_want": "reminders to stop as soon as I complete my order",
+      "so_that": "I am not nagged about something I already bought",
+      "priority": "Should",
+      "points": 3,
+      "prd_ref": "requirements: stop reminders once the shopper completes a purchase",
+      "scenarios": [
+        {
+          "name": "Reminder stops after purchase",
+          "given": [
+            "a shopper received a first reminder"
+          ],
+          "when": [
+            "the shopper completes the order before the follow-up"
+          ],
+          "then": [
+            "the follow-up is not sent"
+          ]
+        },
+        {
+          "name": "Partial purchase keeps the rest",
+          "given": [
+            "a shopper left three items and buys one of them"
+          ],
+          "when": [
+            "the follow-up time arrives"
+          ],
+          "then": [
+            "the follow-up lists only the two remaining items"
+          ]
+        }
+      ]
+    }
+  ],
+  "reviews": [
+    {
+      "story_id": "S1",
+      "scores": {
+        "independent": 2,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 1,
+        "small": 2,
+        "testable": 2
+      },
+      "verdict": "pass",
+      "comment": "Estimable: the abandonment waiting time is an open question in the PRD; size assumes one hour.",
+      "rewrite": null,
+      "scores_after": null
+    },
+    {
+      "story_id": "S2",
+      "scores": {
+        "independent": 2,
+        "negotiable": 1,
+        "valuable": 1,
+        "estimable": 2,
+        "small": 2,
+        "testable": 0
+      },
+      "verdict": "rewrite",
+      "comment": "Original: 'As a manager, I want reminders sent at the right time, so that sales increase' (3 points). 'Right time' is not testable; rewritten with the single follow-up after 24 hours that the PRD requires.",
+      "rewrite": {
+        "id": "S2",
+        "epic": "Reminder emails",
+        "title": "Send one follow-up after 24 hours",
+        "as_a": "e-commerce manager",
+        "i_want": "a single follow-up reminder 24 hours after the first one when the cart is still open",
+        "so_that": "more shoppers come back without being over-contacted",
+        "priority": "Should",
+        "points": 3,
+        "prd_ref": "requirements: send at most one follow-up reminder",
+        "scenarios": []
+      },
+      "scores_after": {
+        "independent": 2,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 1,
+        "small": 2,
+        "testable": 2
+      }
+    },
+    {
+      "story_id": "S3",
+      "scores": {
+        "independent": 1,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 1,
+        "small": 0,
+        "testable": 2
+      },
+      "verdict": "rewrite",
+      "comment": "Original: restore the cart, handle stock, prices and coupons (8 points, more than one sprint with the stock rules). Cut price and coupon handling; the shopper is told which items are unavailable.",
+      "rewrite": {
+        "id": "S3",
+        "epic": "Reminder emails",
+        "title": "Restore my cart from the email link",
+        "as_a": "hesitant shopper",
+        "i_want": "to return to a cart with my items already in it when I follow the email link",
+        "so_that": "I can go straight to checkout",
+        "priority": "Must",
+        "points": 5,
+        "prd_ref": "requirements: restore the cart contents",
+        "scenarios": []
+      },
+      "scores_after": {
+        "independent": 2,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 1,
+        "small": 2,
+        "testable": 2
+      }
+    },
+    {
+      "story_id": "S4",
+      "scores": {
+        "independent": 2,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 2,
+        "small": 2,
+        "testable": 2
+      },
+      "verdict": "pass",
+      "comment": "Small and testable; nothing to flag. Check that the unsubscribe link also works when opened on another device.",
+      "rewrite": null,
+      "scores_after": null
+    },
+    {
+      "story_id": "S5",
+      "scores": {
+        "independent": 1,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 2,
+        "small": 2,
+        "testable": 2
+      },
+      "verdict": "pass",
+      "comment": "Independent: it relies on the reminder schedule from S1 and S2, but it can be tested with the schedule stubbed.",
+      "rewrite": null,
+      "scores_after": null
+    }
+  ]
+}

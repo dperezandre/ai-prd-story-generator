@@ -1,0 +1,86 @@
+Issue Id,Issue Type,Summary,Description,Priority,Parent,Labels
+1,Epic,Compartilhar e acompanhar,,,,
+2,Story,Copiar meu link de indicação,"Como cliente recorrente, quero copiar meu link de indicação na página da minha conta em um passo para possa compartilhá-lo sem precisar falar com o suporte
+
+Critérios de aceite:
+
+Cenário: Link de indicação é copiado para compartilhamento
+  Dado um cliente recorrente está autenticado
+  Quando o cliente escolhe copiar seu link de indicação
+  Então o link fica disponível para colar
+  E o link identifica o cliente como indicador
+
+Cenário: Cada cliente tem um link diferente
+  Dado dois clientes recorrentes estão autenticados
+  Quando cada um abre seu link de indicação
+  Então os dois links são diferentes",Highest,1,moscow-must
+3,Story,Receber crédito pelo primeiro pedido do amigo,"Como cliente recorrente, quero receber crédito na loja quando meu amigo concluir um primeiro pedido para seja recompensado por recomendar a loja
+
+Critérios de aceite:
+
+Cenário: Quem indica é creditado após o primeiro pedido pago
+  Dado um amigo chegou pelo link de indicação de um cliente
+  E o amigo fez e pagou um primeiro pedido
+  Quando o pedido é marcado como concluído
+  Então quem indicou recebe o crédito de indicação
+  E quem indicou é avisado do crédito
+
+Cenário: Não há crédito para pedido não pago
+  Dado um amigo chegou por um link de indicação
+  E o pagamento do pedido do amigo falhou
+  Quando o pedido é cancelado
+  Então quem indicou não recebe crédito
+
+Cenário: O crédito é dado uma única vez por amigo
+  Dado quem indicou já foi creditado por um amigo
+  Quando o amigo conclui um segundo pedido
+  Então quem indicou não recebe crédito adicional",Highest,1,moscow-must
+4,Epic,Experiência do amigo indicado,,,,
+5,Story,Ver o desconto do amigo pelo link de indicação,"Como amigo indicado, quero ver meu desconto ao chegar por um link de indicação e de novo no checkout para saiba que a oferta é real antes de comprar
+
+Critérios de aceite:
+
+Cenário: O desconto aparece na chegada
+  Dado um visitante abre um link de indicação válido
+  Quando a página da loja carrega
+  Então o visitante vê a oferta de desconto para amigos
+  E o visitante vê quem o convidou
+
+Cenário: O desconto é aplicado no checkout
+  Dado um visitante chegou por um link de indicação válido e adicionou itens ao carrinho
+  Quando o visitante chega ao checkout
+  Então o desconto aparece como uma linha no resumo do pedido
+
+Cenário: Link inválido não mostra desconto
+  Dado um visitante abre um link de indicação que não existe
+  Quando a página da loja carrega
+  Então nenhum desconto é exibido
+  E o visitante ainda pode navegar e comprar pelos preços normais",Highest,4,moscow-must
+6,Story,Acompanhar o status dos meus convites,"Como cliente recorrente, quero ver se cada amigo convidado já se cadastrou ou fez pedido para saiba quando esperar meu crédito
+
+Critérios de aceite:
+
+Cenário: Quem indica vê cada etapa
+  Dado um cliente convidou três amigos, um se cadastrou e um fez pedido
+  Quando o cliente abre a página de indicações
+  Então o cliente vê as contagens de convidados, cadastrados e com pedido
+
+Cenário: O estado vazio explica como começar
+  Dado um cliente ainda não compartilhou o link
+  Quando o cliente abre a página de indicações
+  Então o cliente vê como o programa funciona e o link para copiar",High,4,moscow-should
+7,Epic,Integridade do programa,,,,
+8,Story,Bloquear autoindicação,"Como dono do programa, quero que o sistema recuse recompensas quando quem indica e o amigo forem a mesma pessoa para o custo das recompensas não seja desperdiçado com indicações falsas
+
+Critérios de aceite:
+
+Cenário: O mesmo cliente não pode se recompensar
+  Dado um cliente abre o próprio link de indicação em uma conta nova com o mesmo meio de pagamento
+  Quando a conta nova conclui um primeiro pedido
+  Então nenhum desconto é dado à conta nova
+  E nenhum crédito é dado a quem indicou
+
+Cenário: Indicação legítima não é afetada
+  Dado um amigo com outra conta e outro meio de pagamento chega por um link de indicação
+  Quando o amigo conclui um primeiro pedido
+  Então o desconto e o crédito são concedidos",High,7,moscow-should

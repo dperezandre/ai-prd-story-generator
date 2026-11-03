@@ -1,0 +1,71 @@
+Issue Id,Issue Type,Summary,Description,Priority,Parent,Labels
+1,Epic,Reminder emails,,,,
+2,Story,Send a reminder after cart abandonment,"As a hesitant shopper, I want to receive one email reminding me of the items I left in my cart so that I can finish the purchase without searching again
+
+Acceptance criteria:
+
+Scenario: Reminder is sent after the waiting time
+  Given a signed-in shopper who accepted emails left items in the cart
+  When one hour passes without checkout
+  Then the shopper receives a reminder listing the items left in the cart
+
+Scenario: No reminder without consent
+  Given a signed-in shopper who did not accept marketing emails left items in the cart
+  When one hour passes without checkout
+  Then no reminder is sent",Highest,1,moscow-must
+3,Story,Send one follow-up after 24 hours,"As a e-commerce manager, I want a single follow-up reminder 24 hours after the first one when the cart is still open so that more shoppers come back without being over-contacted
+
+Acceptance criteria:
+
+Scenario: Follow-up is sent once
+  Given a shopper received a first reminder and did not buy
+  When 24 hours pass
+  Then the shopper receives one follow-up reminder
+
+Scenario: No third reminder
+  Given a shopper received a reminder and a follow-up and did not buy
+  When more time passes
+  Then no further reminder is sent",High,1,moscow-should
+4,Story,Restore my cart from the email link,"As a hesitant shopper, I want to return to a cart with my items already in it when I follow the email link so that I can go straight to checkout
+
+Acceptance criteria:
+
+Scenario: Cart is restored
+  Given a shopper received a reminder for a cart with two items
+  When the shopper follows the link
+  Then the cart shows the same two items
+  And the shopper can proceed to checkout
+
+Scenario: Unavailable items are explained
+  Given one of the two items is now out of stock
+  When the shopper follows the link
+  Then the cart contains the available item
+  And the shopper is told which item is no longer available",Highest,1,moscow-must
+5,Epic,Customer control,,,,
+6,Story,Unsubscribe from reminders,"As a hesitant shopper, I want to stop receiving cart reminders with one click from any reminder so that my choice is respected immediately
+
+Acceptance criteria:
+
+Scenario: Unsubscribe takes effect immediately
+  Given a shopper received a reminder
+  When the shopper uses the unsubscribe link
+  Then the shopper is confirmed as unsubscribed
+  And no further cart reminders are sent
+
+Scenario: Pending follow-up is cancelled
+  Given a shopper received a first reminder and has a follow-up scheduled
+  When the shopper unsubscribes
+  Then the scheduled follow-up is not sent",Highest,5,moscow-must
+7,Story,Stop reminders after purchase,"As a hesitant shopper, I want reminders to stop as soon as I complete my order so that I am not nagged about something I already bought
+
+Acceptance criteria:
+
+Scenario: Reminder stops after purchase
+  Given a shopper received a first reminder
+  When the shopper completes the order before the follow-up
+  Then the follow-up is not sent
+
+Scenario: Partial purchase keeps the rest
+  Given a shopper left three items and buys one of them
+  When the follow-up time arrives
+  Then the follow-up lists only the two remaining items",High,5,moscow-should
