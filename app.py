@@ -77,7 +77,7 @@ def render_results(result: PipelineResult, t: dict) -> None:
                     t["invest_before"]: rv.scores.total if rv else None,
                     t["invest_after"]: (rv.scores_after.total if rv.scores_after else rv.scores.total) if rv else None,
                 })
-            st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+            st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
             notes = [r for r in result.reviews if r.comment]
             if notes:
                 with st.expander(t["review_notes"]):
