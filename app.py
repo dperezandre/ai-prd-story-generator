@@ -60,7 +60,7 @@ def set_example(case_id: str) -> None:
     st.session_state["idea"] = DEMO_CASES[case_id][st.session_state["lang"]]
 
 
-def render_results(result: PipelineResult, t: dict) -> None:
+def render_results(result: PipelineResult, t: dict, key: str = "", downloads: bool = True) -> None:
     tabs = st.tabs(t["tabs"])
     with tabs[0]:
         if result.prd:
@@ -92,10 +92,13 @@ def render_results(result: PipelineResult, t: dict) -> None:
                                    for sc in s.scenarios)
                 st.code(header + body, language="gherkin")
     with tabs[3]:
-        st.download_button(t["dl_prd"], prd_markdown(result), "prd.md", "text/markdown", key="dl_prd")
-        st.download_button(t["dl_azure"], azure_devops_csv(result), "azure_devops.csv", "text/csv", key="dl_azure")
-        st.download_button(t["dl_jira"], jira_csv(result), "jira.csv", "text/csv", key="dl_jira")
-        st.caption(t["import_help"])
+        if downloads:
+            st.download_button(t["dl_prd"], prd_markdown(result), "prd.md", "text/markdown", key=f"dl_prd{key}")
+            # BOM so Excel on Windows reads the accents as UTF-8. Jira's importer gets no BOM.
+            st.download_button(t["dl_azure"], "﻿" + azure_devops_csv(result), "azure_devops.csv",
+                               "text/csv", key=f"dl_azure{key}")
+            st.download_button(t["dl_jira"], jira_csv(result), "jira.csv", "text/csv", key=f"dl_jira{key}")
+            st.caption(t["import_help"])
 
 
 def main() -> None:
@@ -129,7 +132,6 @@ def main() -> None:
 
     if st.button(t["generate"], type="primary", key="generate"):
         ss.pop("result", None)
-        ss.pop("failed_step", None)
         idea = ss["idea"]
         if ss["demo"]:
             case_id = next((c for c, v in DEMO_CASES.items() if idea.strip() == v[ss["lang"]]), None)
@@ -149,9 +151,12 @@ def main() -> None:
         else:
             try:
                 provider_obj = get_provider(ss["provider"], ss["api_key"], ss.get(f"model_{ss['provider']}"))
+                live_box = st.empty()
                 with st.status(t["steps"]["prd"], expanded=True) as status:
                     def on_step(step: str, partial: PipelineResult) -> None:
                         ss["result"] = partial
+                        with live_box.container():
+                            render_results(partial, t, key=f"_{step}", downloads=False)
                         nxt = STEPS.index(step) + 1
                         status.update(label=t["steps"][STEPS[nxt]] if nxt < len(STEPS) else t["done"])
 
@@ -160,9 +165,9 @@ def main() -> None:
                         status.update(label=t["done"], state="complete", expanded=False)
                     except PipelineError as err:
                         ss["result"] = err.partial
-                        ss["failed_step"] = err.step
                         status.update(label=str(err), state="error")
                         st.error(f"{err} — {t['failed'].format(step=t['steps'][err.step])}")
+                live_box.empty()
             except (ValueError, ProviderError) as err:
                 st.error(str(err))
 

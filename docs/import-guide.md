@@ -34,8 +34,9 @@ The app exports two files: `azure_devops.csv` and `jira.csv`. Both contain one *
 
 ### Before you start
 - You need to be a member of **Project Administrators** or **Team Foundation Administrators** to import work items.
-- The CSV uses `User Story`, which exists in the **Agile** process. In **Scrum** use `Product Backlog Item`; in **CMMI** use `Requirement`. Replace the value in the `Work Item Type` column before importing (find and replace in a spreadsheet editor).
+- The CSV uses `User Story`, which exists in the **Agile** process. In **Scrum** use `Product Backlog Item`; in **CMMI** use `Requirement`. Replace the value in the `Work Item Type` column before importing. Use a text editor, or in Excel open the file with **Data → From Text/CSV** and file origin **UTF-8**; a plain double-click can garble accents and, on some regional settings, put everything in one column.
 - The `Story Points` column matches the Agile field name. In Scrum the field is `Effort`; rename the column header.
+- The **Basic** process has `Epic` and `Issue` but no `Story Points` or `Acceptance Criteria` fields: use `Issue` as the work item type and delete those two columns.
 - Export two or three existing work items from your project first. The exported header shows the exact field names your process uses.
 
 ### Steps
@@ -46,6 +47,7 @@ The app exports two files: `azure_devops.csv` and `jira.csv`. Both contain one *
 5. Fix any row highlighted in red (invalid value), then select **Save items**.
 
 ### Good to know
+- Text that starts with `=`, `+`, `-` or `@` is exported with a leading apostrophe so spreadsheets do not run it as a formula. The apostrophe is imported as part of the text; remove it by hand if it bothers you.
 - Hierarchy comes from `Title 1` (epic) and `Title 2` (story): each story is linked as a child of the epic above it.
 - Up to 1,000 work items per import.
 - New items are created in state **New**, and Area/Iteration default to the project root. Add `Area Path` and `Iteration Path` columns if you need others.

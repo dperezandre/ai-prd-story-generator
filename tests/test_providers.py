@@ -74,3 +74,28 @@ def test_unknown_provider_and_empty_key():
 
 def test_default_models_defined():
     assert set(PROVIDERS) == {"gemini", "groq", "claude", "openai"}
+
+
+def test_gemini_invalid_key_400_is_auth():
+    body = {"error": {"status": "INVALID_ARGUMENT", "message": "API key not valid. API_KEY_INVALID"}}
+    p = get_provider("gemini", KEY, transport=transport(400, body))
+    with pytest.raises(ProviderError) as exc:
+        p.complete("s", "u")
+    assert exc.value.kind == "auth"
+
+
+def test_provider_message_is_shown_but_key_is_stripped():
+    body = {"error": {"message": f"model not found for key {KEY}"}}
+    p = get_provider("groq", KEY, transport=transport(404, body))
+    with pytest.raises(ProviderError) as exc:
+        p.complete("s", "u")
+    assert "model not found" in str(exc.value)
+    assert KEY not in str(exc.value)
+
+
+def test_timeout_has_its_own_message():
+    p = get_provider("claude", KEY, transport=transport(error=httpx.ReadTimeout("slow")))
+    with pytest.raises(ProviderError) as exc:
+        p.complete("s", "u")
+    assert "timed out" in str(exc.value).lower()
+    assert exc.value.kind == "network"

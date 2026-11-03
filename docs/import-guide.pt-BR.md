@@ -34,8 +34,9 @@ O app exporta dois arquivos: `azure_devops.csv` e `jira.csv`. Os dois trazem uma
 
 ### Antes de começar
 - Para importar work items, você precisa ser membro de **Project Administrators** ou **Team Foundation Administrators**.
-- O CSV usa `User Story`, que existe no processo **Agile**. No **Scrum** use `Product Backlog Item`; no **CMMI** use `Requirement`. Troque o valor da coluna `Work Item Type` antes de importar (localizar e substituir em um editor de planilhas).
+- O CSV usa `User Story`, que existe no processo **Agile**. No **Scrum** use `Product Backlog Item`; no **CMMI** use `Requirement`. Troque o valor da coluna `Work Item Type` antes de importar. Use um editor de texto ou, no Excel, abra o arquivo por **Dados → De Texto/CSV** com origem **UTF-8**; um clique duplo simples pode quebrar os acentos e, em algumas configurações regionais, jogar tudo em uma única coluna.
 - A coluna `Story Points` corresponde ao nome do campo no Agile. No Scrum o campo é `Effort`; renomeie o cabeçalho da coluna.
+- O processo **Basic** tem `Epic` e `Issue`, mas não tem os campos `Story Points` nem `Acceptance Criteria`: use `Issue` como tipo e apague essas duas colunas.
 - Exporte dois ou três work items existentes do seu projeto antes. O cabeçalho exportado mostra os nomes exatos dos campos do seu processo.
 
 ### Passos
@@ -46,6 +47,7 @@ O app exporta dois arquivos: `azure_devops.csv` e `jira.csv`. Os dois trazem uma
 5. Corrija as linhas destacadas em vermelho (valor inválido) e selecione **Save items**.
 
 ### Bom saber
+- Textos que começam com `=`, `+`, `-` ou `@` saem com um apóstrofo no início para que a planilha não os execute como fórmula. O apóstrofo é importado como parte do texto; remova-o à mão se incomodar.
 - A hierarquia vem de `Title 1` (épico) e `Title 2` (história): cada história vira filha do épico que está acima dela.
 - Até 1.000 work items por importação.
 - Os itens novos nascem no estado **New**, e Area/Iteration ficam na raiz do projeto. Adicione as colunas `Area Path` e `Iteration Path` se precisar de outros valores.

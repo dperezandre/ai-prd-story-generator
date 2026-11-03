@@ -63,7 +63,7 @@ Boundaries: the UI does not know providers; the pipeline does not know Streamlit
 idea + language + provider/key
   → [1] PRD (JSON → Markdown)
   → [2] epics + stories (As a / I want / So that, MoSCoW, estimate, prd_ref)
-  → [3] INVEST review (score 0–2 per criterion, verdict, rewrite if any < 2)
+  → [3] INVEST review (score 0–2 per criterion, verdict; `pass` only if every score is 2 or the lowest is a single 1 explained in the comment, otherwise `rewrite`)
   → [4] Gherkin (2–4 scenarios per story: happy, alternative, error)
   → exporters: PRD.md · azure_devops.csv · jira.csv
 ```

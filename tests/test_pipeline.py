@@ -109,14 +109,12 @@ def test_idea_over_max_raises():
 
 
 def test_provider_error_midway_keeps_completed_steps():
-    key = "sk-SECRET"
     responses = good_responses()[:1] + [ProviderError("Groq rate limit reached.", "rate_limit")]
     with pytest.raises(PipelineError) as exc:
         run(responses)
     err = exc.value
     assert err.step == "stories"
     assert err.partial.prd is not None and err.partial.stories == []
-    assert key not in str(err)
     assert isinstance(err.partial, PipelineResult)
 
 
@@ -141,3 +139,16 @@ def test_rewrite_with_wrong_id_still_targets_reviewed_story():
     res, _ = run(r)
     assert [s.id for s in res.stories] == ["S1", "S2"]
     assert res.stories[1].title == "renamed"
+
+
+def test_rewrite_cannot_move_story_to_another_epic():
+    r = good_responses()
+    r[2] = json.dumps({"reviews": [
+        {"story_id": "S2", "scores": BAD, "verdict": "rewrite", "comment": "c",
+         "rewrite": story(2, epic="Sneaky other epic"), "scores_after": SCORES}]})
+    res, _ = run(r)
+    assert res.stories[1].epic == "E1"
+
+
+def test_json_extraction_survives_braces_in_surrounding_prose():
+    assert parse_json_response('Note {x} first. {"a": 1} done {y}') == {"a": 1}

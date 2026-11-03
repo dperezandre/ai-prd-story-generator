@@ -11,7 +11,7 @@ PROVIDERS: dict[str, str] = {
     "openai": "gpt-4o-mini",
 }
 
-_TIMEOUT = 90.0
+_TIMEOUT = httpx.Timeout(10.0, read=180.0)
 _MAX_TOKENS = 8192
 
 
@@ -35,6 +35,17 @@ class _HttpProvider:
         self.model = model
         self._client = httpx.Client(transport=transport, timeout=_TIMEOUT)
 
+    def _detail(self, resp: httpx.Response) -> str:
+        """Provider's error message (key stripped, truncated), or an empty string."""
+        if resp.status_code < 400:
+            return ""
+        try:
+            err = resp.json().get("error", "")
+            text = err.get("message", "") if isinstance(err, dict) else str(err)
+        except (ValueError, AttributeError):
+            return ""
+        return str(text).replace(self._key, "[key]")[:200]
+
     def _request(self, system: str, user: str) -> tuple[str, dict, dict]:
         raise NotImplementedError
 
@@ -45,14 +56,18 @@ class _HttpProvider:
         url, headers, body = self._request(system, user)
         try:
             resp = self._client.post(url, headers=headers, json=body)
+        except httpx.TimeoutException:
+            raise ProviderError(f"{self.name} timed out. Try again or choose a faster model.", "network") from None
         except httpx.HTTPError:
             raise ProviderError(f"Could not reach {self.name}. Check your connection.", "network") from None
-        if resp.status_code in (401, 403):
+        detail = self._detail(resp)
+        if resp.status_code in (401, 403) or (resp.status_code == 400 and "API_KEY_INVALID" in detail):
             raise ProviderError(f"{self.name} rejected the API key (HTTP {resp.status_code}).", "auth")
         if resp.status_code == 429:
             raise ProviderError(f"{self.name} rate limit reached. Wait a moment and try again.", "rate_limit")
         if resp.status_code >= 400:
-            raise ProviderError(f"{self.name} returned HTTP {resp.status_code}.", "other")
+            suffix = f": {detail}" if detail else "."
+            raise ProviderError(f"{self.name} returned HTTP {resp.status_code}{suffix}", "other")
         try:
             text = self._extract(resp.json())
         except (KeyError, IndexError, TypeError, ValueError):

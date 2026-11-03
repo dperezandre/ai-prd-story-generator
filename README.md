@@ -27,10 +27,10 @@ flowchart LR
     E --> H[Jira CSV]
 ```
 
-- **PRD** with problem, personas, goals, metrics, scope in/out, requirements, risks, **assumptions and open questions**. Nothing the idea did not say is presented as fact.
-- **User stories** with MoSCoW priority and points, each traceable to a PRD requirement.
+- **PRD** with problem, personas, goals, metrics, scope in/out, requirements, risks, **assumptions and open questions**. The prompts instruct the model to label anything the idea did not say as an assumption.
+- **User stories** with MoSCoW priority and points, each carrying a reference to the PRD requirement it came from (the reference is text written by the model, not verified by code).
 - **INVEST reviewer**: an adversarial PO scores every story 0-2 on each criterion and rewrites the weak ones.
-- **Gherkin** scenarios (success, alternative and error path) in business language.
+- **Gherkin** scenarios in business language; the prompt asks for a success, an alternative and an error path per story.
 - **Exports** for Azure DevOps and Jira, plus the PRD in Markdown. See the [import guide](docs/import-guide.md).
 - **Bilingual**: output in English or Brazilian Portuguese, with prompts written natively in each.
 
@@ -54,9 +54,9 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Demo mode is on by default: it replays two pre-written examples with **no API key and no network**, so you can explore every tab and download the CSVs straight away.
+Demo mode is on by default: it replays two pre-written examples with **no API key and no calls to any AI provider**, so you can explore every tab and download the CSVs straight away.
 
-To use your own ideas, turn demo mode off in the sidebar, choose a provider and paste your API key. The key stays in the browser session only; it is never written to disk or logged.
+To use your own ideas, turn demo mode off in the sidebar, choose a provider and paste your API key. The key is kept in memory for that Streamlit session only; it is never written to disk or logged by this app.
 
 | Provider | Notes |
 |---|---|
@@ -86,6 +86,7 @@ src/providers.py    Gemini, Groq, Claude and OpenAI behind one interface
 src/models.py       validated PRD, Story, Review models
 src/exporters.py    Markdown, Azure DevOps CSV, Jira CSV
 src/demo.py         demo mode
+scripts/            regenerate the examples with a real provider
 prompts/en|pt-BR/   the four system prompts per language
 examples/           two complete cases in both languages
 docs/               import guide, prompt design notes

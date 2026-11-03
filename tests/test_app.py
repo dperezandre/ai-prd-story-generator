@@ -52,3 +52,31 @@ def test_live_mode_with_empty_idea_shows_error():
     by_key(at.text_area, "idea").set_value("   ").run()
     by_key(at.button, "generate").click().run()
     assert not at.exception and len(at.error) == 1
+
+
+def live_run(monkeypatch, responses):
+    import src.providers
+    from tests.conftest import FakeProvider
+    monkeypatch.setattr(src.providers, "get_provider", lambda *a, **k: FakeProvider(responses))
+    at = fresh()
+    by_key(at.toggle, "demo").set_value(False).run()
+    by_key(at.text_input, "api_key").set_value("k").run()
+    by_key(at.text_area, "idea").set_value("A feature idea").run()
+    by_key(at.button, "generate").click().run()
+    return at
+
+
+def test_live_mode_success_renders_results(monkeypatch):
+    from tests.test_pipeline import good_responses
+    at = live_run(monkeypatch, good_responses())
+    assert not at.exception and not at.error
+    assert len(at.tabs) == 4 and len(at.get("download_button")) == 3
+
+
+def test_live_mode_failure_midway_shows_error_and_partial_results(monkeypatch):
+    from src.providers import ProviderError
+    from tests.test_pipeline import good_responses
+    at = live_run(monkeypatch, good_responses()[:1] + [ProviderError("Groq rate limit reached.", "rate_limit")])
+    assert not at.exception
+    assert any("rate limit" in e.value for e in at.error)
+    assert len(at.tabs) == 4

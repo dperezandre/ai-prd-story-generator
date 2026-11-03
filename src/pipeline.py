@@ -25,10 +25,14 @@ class PipelineError(Exception):
 
 def parse_json_response(text: str) -> Any:
     """Parse a JSON object from model output, tolerating fences and surrounding prose."""
-    start, end = text.find("{"), text.rfind("}")
-    if start == -1 or end <= start:
-        raise ValueError("No JSON object found in the response.")
-    return json.loads(text[start:end + 1])
+    decoder = json.JSONDecoder()
+    for start, char in enumerate(text):
+        if char == "{":
+            try:
+                return decoder.raw_decode(text, start)[0]
+            except ValueError:
+                continue
+    raise ValueError("No JSON object found in the response.")
 
 
 class _StoryList(BaseModel):
@@ -104,7 +108,7 @@ def run_pipeline(idea: str, language: Language, provider: LLMProvider,
                 kept[review.story_id] = review
         for sid, review in kept.items():
             if review.rewrite is not None:
-                fixed = review.rewrite.model_copy(update={"id": sid})
+                fixed = review.rewrite.model_copy(update={"id": sid, "epic": result.stories[by_id[sid]].epic})
                 result.stories[by_id[sid]] = fixed
                 review.rewrite = fixed
         result.reviews = list(kept.values())

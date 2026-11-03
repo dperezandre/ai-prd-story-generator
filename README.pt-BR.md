@@ -27,10 +27,10 @@ flowchart LR
     E --> H[CSV Jira]
 ```
 
-- **PRD** com problema, personas, objetivos, métricas, escopo dentro e fora, requisitos, riscos, **premissas e perguntas em aberto**. Nada que a ideia não disse é apresentado como fato.
-- **Histórias de usuário** com prioridade MoSCoW e pontos, cada uma rastreável a um requisito do PRD.
+- **PRD** com problema, personas, objetivos, métricas, escopo dentro e fora, requisitos, riscos, **premissas e perguntas em aberto**. Os prompts instruem o modelo a marcar como premissa tudo o que a ideia não disse.
+- **Histórias de usuário** com prioridade MoSCoW e pontos, cada uma com a referência ao requisito do PRD de onde veio (a referência é texto escrito pelo modelo, não verificado pelo código).
 - **Revisor INVEST**: um PO adversarial dá nota de 0 a 2 em cada critério de cada história e reescreve as fracas.
-- **Gherkin** com cenários de sucesso, alternativo e de erro, em linguagem de negócio.
+- **Gherkin** em linguagem de negócio; o prompt pede um caminho de sucesso, um alternativo e um de erro por história.
 - **Exportações** para Azure DevOps e Jira, além do PRD em Markdown. Veja o [guia de importação](docs/import-guide.pt-BR.md).
 - **Bilíngue**: saída em português do Brasil ou em inglês, com prompts escritos nativamente em cada idioma.
 
@@ -54,9 +54,9 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-O modo demo vem ligado por padrão: ele reproduz dois exemplos pré-escritos **sem chave de API e sem rede**, então você explora todas as abas e baixa os CSVs na hora.
+O modo demo vem ligado por padrão: ele reproduz dois exemplos pré-escritos **sem chave de API e sem chamar nenhum provedor de IA**, então você explora todas as abas e baixa os CSVs na hora.
 
-Para usar suas próprias ideias, desligue o modo demo na barra lateral, escolha um provedor e cole a sua chave de API. A chave fica só na sessão do navegador; nunca é gravada em disco nem registrada em log.
+Para usar suas próprias ideias, desligue o modo demo na barra lateral, escolha um provedor e cole a sua chave de API. A chave fica na memória apenas durante a sessão do Streamlit; este app nunca a grava em disco nem a registra em log.
 
 | Provedor | Observações |
 |---|---|
@@ -86,6 +86,7 @@ src/providers.py    Gemini, Groq, Claude e OpenAI atrás de uma interface
 src/models.py       modelos validados de PRD, História e Revisão
 src/exporters.py    Markdown, CSV Azure DevOps, CSV Jira
 src/demo.py         modo demo
+scripts/            regenera os exemplos com um provedor real
 prompts/en|pt-BR/   os quatro prompts de sistema por idioma
 examples/           dois casos completos nos dois idiomas
 docs/               guia de importação, notas de design
