@@ -1,6 +1,6 @@
 # AI PRD & User Story Generator
 
-[![tests](https://github.com/YOUR_GITHUB_USER/ai-prd-story-generator/actions/workflows/tests.yml/badge.svg)](https://github.com/YOUR_GITHUB_USER/ai-prd-story-generator/actions)
+[![tests](https://github.com/dperezandre/ai-prd-story-generator/actions/workflows/tests.yml/badge.svg)](https://github.com/dperezandre/ai-prd-story-generator/actions)
 
 **Turn a one-line feature idea into a PRD, INVEST-reviewed user stories and Gherkin acceptance criteria, ready to import into Azure DevOps or Jira.**
 
@@ -48,7 +48,7 @@ The reviewer's note: *"'Fast' and 'nice' cannot be verified and the size does no
 ## Quick start
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USER/ai-prd-story-generator.git
+git clone https://github.com/dperezandre/ai-prd-story-generator.git
 cd ai-prd-story-generator
 pip install -r requirements.txt
 streamlit run app.py

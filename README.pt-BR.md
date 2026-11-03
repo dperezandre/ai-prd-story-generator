@@ -1,6 +1,6 @@
 # Gerador de PRD e Histórias de Usuário com IA
 
-[![tests](https://github.com/YOUR_GITHUB_USER/ai-prd-story-generator/actions/workflows/tests.yml/badge.svg)](https://github.com/YOUR_GITHUB_USER/ai-prd-story-generator/actions)
+[![tests](https://github.com/dperezandre/ai-prd-story-generator/actions/workflows/tests.yml/badge.svg)](https://github.com/dperezandre/ai-prd-story-generator/actions)
 
 **Transforme uma ideia de funcionalidade em um PRD, histórias de usuário revisadas pelo INVEST e critérios de aceite em Gherkin, prontos para importar no Azure DevOps ou no Jira.**
 
@@ -48,7 +48,7 @@ A nota do revisor: *"'Rápida' e 'bonita' não são verificáveis e o tamanho n�
 ## Como rodar
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USER/ai-prd-story-generator.git
+git clone https://github.com/dperezandre/ai-prd-story-generator.git
 cd ai-prd-story-generator
 pip install -r requirements.txt
 streamlit run app.py
