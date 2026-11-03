@@ -19,7 +19,7 @@
 - Providers: Gemini, Groq (free tiers), Claude, OpenAI; BYOK; plus demo mode with no key and no network.
 - Priority is MoSCoW: `Must | Should | Could | Won't`. INVEST score per criterion is an int 0–2.
 - Azure DevOps CSV columns: `Work Item Type, Title 1, Title 2, Description, Acceptance Criteria, Priority, Story Points, Tags`; epic uses `Title 1`, story uses `Title 2`.
-- Jira CSV: `Issue Type, Summary, Description, Priority, Parent/Epic link, Labels`; acceptance criteria inside the description (exact columns confirmed in Task 6 against official docs).
+- Jira CSV (confirmed in Task 6 against Atlassian docs; Epic Link/Epic Name are deprecated): `Issue Id, Issue Type, Summary, Description, Priority, Parent, Labels`; `Parent` holds the epic's `Issue Id`, epic rows come before their stories; acceptance criteria inside the description.
 - CSV is UTF-8 and correctly escapes accents, commas, quotes and line breaks.
 - Gherkin keywords: EN `Given/When/Then/And`; PT-BR `Dado/Quando/Então/E`.
 - Anything not derived from the idea is labelled an assumption; no invented metrics.
