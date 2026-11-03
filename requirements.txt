@@ -1,0 +1,5 @@
+streamlit
+pydantic>=2
+httpx
+pytest
+pandas

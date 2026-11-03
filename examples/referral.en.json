@@ -1,0 +1,383 @@
+{
+  "idea": "Referral program: let existing customers invite friends by link and reward both sides with a discount on their next order.",
+  "language": "en",
+  "prd": {
+    "title": "Customer referral program",
+    "problem": "Acquiring customers through paid channels is getting more expensive, while satisfied customers have no easy way to recommend the store. Marketing cannot measure word of mouth today, so it is neither encouraged nor funded.",
+    "personas": [
+      "Returning customer: wants to recommend the store and be rewarded without asking support",
+      "Referred friend: wants to know the offer is real before creating an account",
+      "Program owner (marketing): wants to grow acquisition and control the cost of rewards"
+    ],
+    "goals": [
+      "Increase the share of new customers acquired through recommendations",
+      "Reward both the referrer and the friend in a way that is simple to understand",
+      "Keep the cost of the program predictable and resistant to abuse"
+    ],
+    "success_metrics": [
+      "Share of new customers acquired through referral: increase (baseline not provided)",
+      "Referral conversion rate (invited friends who place a first order): increase (baseline not provided)",
+      "Reward cost per referred customer: stay below the paid-channel acquisition cost"
+    ],
+    "scope_in": [
+      "Unique referral link per customer",
+      "Discount for the friend and credit for the referrer after the friend's first order",
+      "Referrer view of invitation status",
+      "Basic abuse prevention"
+    ],
+    "scope_out": [
+      "Referral through social media APIs or contact import",
+      "Multi-level or tiered rewards"
+    ],
+    "requirements": [
+      "The system must give every customer a unique referral link",
+      "The system must show the friend's discount before checkout when they arrive through a referral link",
+      "The system must credit the referrer after the friend's first order is completed",
+      "The system must let the referrer see the status of each invitation",
+      "The system must block self-referral and repeated rewards for the same friend"
+    ],
+    "risks": [
+      "Reward abuse by fake accounts - mitigation: reward only after a completed, paid first order",
+      "Discount cost exceeds the budget - mitigation: cap total rewards per customer per month"
+    ],
+    "assumptions": [
+      "Assumption: the reward is a store credit, not cash; the idea does not say which",
+      "Assumption: customers already have accounts and can sign in"
+    ],
+    "open_questions": [
+      "What are the reward amounts and who funds them?",
+      "What is today's acquisition cost per customer, to set the break-even point?"
+    ]
+  },
+  "stories": [
+    {
+      "id": "S1",
+      "epic": "Share and track",
+      "title": "Copy my referral link",
+      "as_a": "returning customer",
+      "i_want": "to copy my referral link from my account page in one step",
+      "so_that": "I can share it without asking support",
+      "priority": "Must",
+      "points": 3,
+      "prd_ref": "requirements: unique referral link",
+      "scenarios": [
+        {
+          "name": "Referral link is copied for sharing",
+          "given": [
+            "a returning customer is signed in"
+          ],
+          "when": [
+            "the customer chooses to copy their referral link"
+          ],
+          "then": [
+            "the link is available to paste",
+            "the link identifies the customer as the referrer"
+          ]
+        },
+        {
+          "name": "Each customer has a different link",
+          "given": [
+            "two returning customers are signed in"
+          ],
+          "when": [
+            "each opens their referral link"
+          ],
+          "then": [
+            "the two links are different"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S2",
+      "epic": "Share and track",
+      "title": "Receive credit for a friend's first order",
+      "as_a": "returning customer",
+      "i_want": "to receive store credit when my friend completes a first order",
+      "so_that": "I am rewarded for recommending the store",
+      "priority": "Must",
+      "points": 5,
+      "prd_ref": "requirements: credit the referrer after the friend's first order",
+      "scenarios": [
+        {
+          "name": "Referrer is credited after the first paid order",
+          "given": [
+            "a friend arrived through a customer's referral link",
+            "the friend placed and paid a first order"
+          ],
+          "when": [
+            "the order is marked as completed"
+          ],
+          "then": [
+            "the referrer receives the referral credit",
+            "the referrer is notified of the credit"
+          ]
+        },
+        {
+          "name": "Credit is not given for an unpaid order",
+          "given": [
+            "a friend arrived through a referral link",
+            "the friend's order payment failed"
+          ],
+          "when": [
+            "the order is cancelled"
+          ],
+          "then": [
+            "the referrer receives no credit"
+          ]
+        },
+        {
+          "name": "Credit is given only once per friend",
+          "given": [
+            "a referrer was already credited for a friend"
+          ],
+          "when": [
+            "the friend completes a second order"
+          ],
+          "then": [
+            "the referrer receives no additional credit"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S3",
+      "epic": "Referred friend experience",
+      "title": "See the friend discount from the referral link",
+      "as_a": "referred friend",
+      "i_want": "to see my discount when I arrive through a referral link and again at checkout",
+      "so_that": "I know the offer is real before I buy",
+      "priority": "Must",
+      "points": 3,
+      "prd_ref": "requirements: show the friend's discount before checkout",
+      "scenarios": [
+        {
+          "name": "Discount is shown on arrival",
+          "given": [
+            "a visitor opens a valid referral link"
+          ],
+          "when": [
+            "the store page loads"
+          ],
+          "then": [
+            "the visitor sees the friend discount offer",
+            "the visitor sees who invited them"
+          ]
+        },
+        {
+          "name": "Discount is applied at checkout",
+          "given": [
+            "a visitor arrived through a valid referral link and added items to the cart"
+          ],
+          "when": [
+            "the visitor reaches checkout"
+          ],
+          "then": [
+            "the discount appears as a line in the order summary"
+          ]
+        },
+        {
+          "name": "Invalid link shows no discount",
+          "given": [
+            "a visitor opens a referral link that does not exist"
+          ],
+          "when": [
+            "the store page loads"
+          ],
+          "then": [
+            "no discount is shown",
+            "the visitor can still browse and buy at regular prices"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S4",
+      "epic": "Referred friend experience",
+      "title": "Check the status of my invitations",
+      "as_a": "returning customer",
+      "i_want": "to see whether each invited friend has registered or ordered",
+      "so_that": "I know when to expect my credit",
+      "priority": "Should",
+      "points": 5,
+      "prd_ref": "requirements: let the referrer see invitation status",
+      "scenarios": [
+        {
+          "name": "Referrer sees each stage",
+          "given": [
+            "a customer has invited three friends, one registered and one ordered"
+          ],
+          "when": [
+            "the customer opens the referral page"
+          ],
+          "then": [
+            "the customer sees counts for invited, registered and ordered"
+          ]
+        },
+        {
+          "name": "Empty state explains how to start",
+          "given": [
+            "a customer has not shared the link yet"
+          ],
+          "when": [
+            "the customer opens the referral page"
+          ],
+          "then": [
+            "the customer sees how the program works and the link to copy"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S5",
+      "epic": "Program integrity",
+      "title": "Block self-referral",
+      "as_a": "program owner",
+      "i_want": "the system to refuse rewards when the referrer and the friend are the same person",
+      "so_that": "reward cost is not wasted on fake referrals",
+      "priority": "Should",
+      "points": 5,
+      "prd_ref": "requirements: block self-referral and repeated rewards",
+      "scenarios": [
+        {
+          "name": "Same customer cannot reward themselves",
+          "given": [
+            "a customer opens their own referral link in a new account with the same payment method"
+          ],
+          "when": [
+            "the new account completes a first order"
+          ],
+          "then": [
+            "no discount is given to the new account",
+            "no credit is given to the referrer"
+          ]
+        },
+        {
+          "name": "Legitimate referral is unaffected",
+          "given": [
+            "a friend with a different account and payment method arrives through a referral link"
+          ],
+          "when": [
+            "the friend completes a first order"
+          ],
+          "then": [
+            "both the discount and the credit are granted"
+          ]
+        }
+      ]
+    }
+  ],
+  "reviews": [
+    {
+      "story_id": "S1",
+      "scores": {
+        "independent": 2,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 2,
+        "small": 2,
+        "testable": 2
+      },
+      "verdict": "pass",
+      "comment": "Estimable is the weakest: whether the link needs a vanity format is unclear, but this does not block sizing.",
+      "rewrite": null,
+      "scores_after": null
+    },
+    {
+      "story_id": "S2",
+      "scores": {
+        "independent": 2,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 1,
+        "small": 2,
+        "testable": 2
+      },
+      "verdict": "pass",
+      "comment": "Estimable: credit timing depends on the return window, which the PRD leaves open; ask before the sprint.",
+      "rewrite": null,
+      "scores_after": null
+    },
+    {
+      "story_id": "S3",
+      "scores": {
+        "independent": 2,
+        "negotiable": 1,
+        "valuable": 1,
+        "estimable": 1,
+        "small": 0,
+        "testable": 0
+      },
+      "verdict": "rewrite",
+      "comment": "Original: 'As a friend, I want a fast and nice landing experience, so that people convert' (13 points). 'Fast' and 'nice' cannot be verified and the size does not fit a sprint; rewritten around the discount the friend actually needs to see.",
+      "rewrite": {
+        "id": "S3",
+        "epic": "Referred friend experience",
+        "title": "See the friend discount from the referral link",
+        "as_a": "referred friend",
+        "i_want": "to see my discount when I arrive through a referral link and again at checkout",
+        "so_that": "I know the offer is real before I buy",
+        "priority": "Must",
+        "points": 3,
+        "prd_ref": "requirements: show the friend's discount before checkout",
+        "scenarios": []
+      },
+      "scores_after": {
+        "independent": 2,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 2,
+        "small": 2,
+        "testable": 2
+      }
+    },
+    {
+      "story_id": "S4",
+      "scores": {
+        "independent": 1,
+        "negotiable": 1,
+        "valuable": 2,
+        "estimable": 2,
+        "small": 1,
+        "testable": 1
+      },
+      "verdict": "rewrite",
+      "comment": "Original: 'a dashboard with full referral analytics' (8 points) mixes reporting with status. Cut to the three counts the customer needs; analytics for the program owner is out of scope.",
+      "rewrite": {
+        "id": "S4",
+        "epic": "Referred friend experience",
+        "title": "Check the status of my invitations",
+        "as_a": "returning customer",
+        "i_want": "to see whether each invited friend has registered or ordered",
+        "so_that": "I know when to expect my credit",
+        "priority": "Should",
+        "points": 5,
+        "prd_ref": "requirements: let the referrer see invitation status",
+        "scenarios": []
+      },
+      "scores_after": {
+        "independent": 2,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 1,
+        "small": 2,
+        "testable": 2
+      }
+    },
+    {
+      "story_id": "S5",
+      "scores": {
+        "independent": 2,
+        "negotiable": 2,
+        "valuable": 2,
+        "estimable": 2,
+        "small": 1,
+        "testable": 2
+      },
+      "verdict": "pass",
+      "comment": "Small: 5 points is the limit; the rule for 'same person' must stay minimal (payment method and device are enough for v1).",
+      "rewrite": null,
+      "scores_after": null
+    }
+  ]
+}
