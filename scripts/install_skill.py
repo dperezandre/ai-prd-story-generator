@@ -17,6 +17,7 @@ def install(skills_dir: Path) -> Path:
     dest.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(SKILL_DIR / "SKILL.md", dest / "SKILL.md")
     shutil.copyfile(STANDARD, dest / "standard.pt-BR.md")
+    shutil.copytree(SKILL_DIR / "scripts", dest / "scripts", dirs_exist_ok=True)
     return dest
 
 

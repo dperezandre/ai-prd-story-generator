@@ -23,7 +23,18 @@ Revisa uma especificação funcional como um PO crítico e a leva ao padrão des
    - **Qualidade**: texto vago, história grande, Gherkin fraco.
 4. **Quebrar em histórias.** Tabela: id, história (Como/Quero/Para), MoSCoW, pontos, regras `RN` cobertas, veredito INVEST (ok, dividir, bloqueada por qual achado). Histórias acima de 8 pontos são divididas. Habilitadoras técnicas são marcadas como tal.
 5. **Escrever o Gherkin** das histórias não bloqueadas: cenário nomeado, um comportamento por cenário, ao menos feliz, alternativo e erro, cada um apontando a `RN`. Histórias bloqueadas só recebem a pergunta que as desbloqueia.
-6. **Entregar.** Responda em português do Brasil, nesta ordem: resumo em 3 linhas; conformidade com o padrão; contradições; lacunas; qualidade; quebra em histórias; perguntas para a área de negócio, agrupadas por quem deve responder (negócio, médico/consultor, tecnologia).
+6. **Entregar.** Responda em português do Brasil, nesta ordem: resumo em 3 linhas; conformidade com o padrão; contradições; lacunas; qualidade; quebra em histórias; perguntas para a área de negócio, agrupadas por quem deve responder (negócio, médico/consultor, tecnologia); por fim, o PDF das histórias (seção abaixo).
+
+## PDF das histórias (sempre, no final)
+
+Depois da resposta, gere um PDF com as histórias quebradas para o Azure DevOps. Cada história tem exatamente três blocos, nesta ordem: **Título**, **Descrição** e **Critérios de aceite**.
+
+1. Monte um JSON no scratchpad: `{"document": "<nome da especificação>", "stories": [{"title": "...", "description": "Como ..., quero ..., para ...", "acceptance_criteria": ["Cenário: ...\n  Dado ...\n  Quando ...\n  Então ...", "..."]}]}`.
+2. Título curto e no imperativo (vira o Title do work item). Descrição no formato Como/Quero/Para (vira a Description). Cada critério é um cenário Gherkin completo, um comportamento por cenário (vira o Acceptance Criteria).
+3. Inclua **todas** as histórias da tabela. Nas bloqueadas, escreva os critérios que o texto já sustenta e marque cada ponto em aberto como `[A DEFINIR] <a pergunta>`. Nunca preencha o vazio com suposição.
+4. Rode `python "<pasta desta skill>/scripts/stories_pdf.py" <json> "<saida.pdf>"` (precisa de `pip install pymupdf`).
+5. Salve na **mesma pasta do documento analisado**, com o nome `Historias - <nome do documento>.pdf`. Se o documento não for um arquivo, pergunte a pasta. Nunca salve dentro de um repositório público.
+6. Apague o JSON temporário e informe o caminho completo do PDF.
 
 ## Modo converter
 
