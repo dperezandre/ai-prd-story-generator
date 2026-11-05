@@ -47,6 +47,28 @@
     "open_questions": [
       "Quais são os valores das recompensas e quem as financia?",
       "Qual é o custo de aquisição por cliente hoje, para definir o ponto de equilíbrio?"
+    ],
+    "as_is": [
+      "Clientes não conseguem convidar amigos nem ganhar recompensa por novos clientes.",
+      "A aquisição depende só de canais pagos."
+    ],
+    "to_be": [
+      "Cada cliente tem um link de indicação único.",
+      "O amigo que chega pelo link vê o desconto antes do checkout.",
+      "Quem indicou recebe o crédito depois do primeiro pedido concluído do amigo."
+    ],
+    "systems": [
+      "Loja online - Checkout",
+      "Conta do cliente - Área de indicação"
+    ],
+    "business_rules": [
+      "RN01: Um link de indicação pertence a exatamente um cliente.",
+      "RN02: Quem indicou só recebe o crédito depois que o primeiro pedido do amigo é concluído.",
+      "RN03: Um cliente não pode indicar a si mesmo, e um amigo só pode gerar uma recompensa."
+    ],
+    "expected_returns": [
+      "Experiência: participação de novos clientes adquiridos por indicação",
+      "Financeiro: custo de aquisição por cliente (linha de base não informada)"
     ]
   },
   "stories": [
@@ -60,6 +82,9 @@
       "priority": "Must",
       "points": 3,
       "prd_ref": "requirements: link de indicação único",
+      "rule_refs": [
+        "RN01"
+      ],
       "scenarios": [
         {
           "name": "Link de indicação é copiado para compartilhamento",
@@ -98,6 +123,10 @@
       "priority": "Must",
       "points": 5,
       "prd_ref": "requirements: creditar quem indicou após o primeiro pedido do amigo",
+      "rule_refs": [
+        "RN02",
+        "RN03"
+      ],
       "scenarios": [
         {
           "name": "Quem indica é creditado após o primeiro pedido pago",
@@ -150,6 +179,7 @@
       "priority": "Must",
       "points": 3,
       "prd_ref": "requirements: mostrar o desconto do amigo antes do checkout",
+      "rule_refs": [],
       "scenarios": [
         {
           "name": "O desconto aparece na chegada",
@@ -201,6 +231,7 @@
       "priority": "Should",
       "points": 5,
       "prd_ref": "requirements: permitir que quem indica veja o status dos convites",
+      "rule_refs": [],
       "scenarios": [
         {
           "name": "Quem indica vê cada etapa",
@@ -238,6 +269,9 @@
       "priority": "Should",
       "points": 5,
       "prd_ref": "requirements: bloquear autoindicação e recompensas repetidas",
+      "rule_refs": [
+        "RN03"
+      ],
       "scenarios": [
         {
           "name": "O mesmo cliente não pode se recompensar",
@@ -320,6 +354,7 @@
         "priority": "Must",
         "points": 3,
         "prd_ref": "requirements: mostrar o desconto do amigo antes do checkout",
+        "rule_refs": [],
         "scenarios": []
       },
       "scores_after": {
@@ -353,6 +388,7 @@
         "priority": "Should",
         "points": 5,
         "prd_ref": "requirements: permitir que quem indica veja o status dos convites",
+        "rule_refs": [],
         "scenarios": []
       },
       "scores_after": {

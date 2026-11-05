@@ -12,18 +12,23 @@ _HEADINGS = {
         "success_metrics": "Success metrics", "scope_in": "In scope",
         "scope_out": "Out of scope", "requirements": "Requirements",
         "risks": "Risks", "assumptions": "Assumptions",
-        "open_questions": "Open questions",
+        "open_questions": "Open questions", "as_is": "As-is", "to_be": "To-be",
+        "systems": "Systems and modules", "business_rules": "Business rules",
+        "expected_returns": "Expected returns",
     },
     "pt-BR": {
         "problem": "Problema", "personas": "Personas", "goals": "Objetivos",
         "success_metrics": "Métricas de sucesso", "scope_in": "Dentro do escopo",
         "scope_out": "Fora do escopo", "requirements": "Requisitos",
         "risks": "Riscos", "assumptions": "Premissas",
-        "open_questions": "Perguntas em aberto",
+        "open_questions": "Perguntas em aberto", "as_is": "Situação atual (AS IS)",
+        "to_be": "Situação futura (TO BE)", "systems": "Sistemas e módulos",
+        "business_rules": "Regras de negócio", "expected_returns": "Retornos esperados",
     },
 }
-_LIST_FIELDS = ["personas", "goals", "success_metrics", "scope_in", "scope_out",
-                "requirements", "risks", "assumptions", "open_questions"]
+_LIST_FIELDS = ["as_is", "to_be", "personas", "goals", "success_metrics", "systems",
+                "scope_in", "scope_out", "requirements", "business_rules",
+                "expected_returns", "risks", "assumptions", "open_questions"]
 
 _KEYWORDS = {
     "en": dict(scenario="Scenario", given="Given", when="When", then="Then", and_="And"),
@@ -43,6 +48,11 @@ class PRD(BaseModel):
     risks: list[str] = []
     assumptions: list[str] = []
     open_questions: list[str] = []
+    as_is: list[str] = []
+    to_be: list[str] = []
+    systems: list[str] = []
+    business_rules: list[str] = []
+    expected_returns: list[str] = []
 
     def to_markdown(self, language: Language) -> str:
         h = _HEADINGS[language]
@@ -80,6 +90,7 @@ class Story(BaseModel):
     priority: Priority
     points: int
     prd_ref: str
+    rule_refs: list[str] = []
     scenarios: list[Scenario] = []
 
     def to_text(self, language: Language) -> str:

@@ -4,6 +4,17 @@
 
 Acquiring customers through paid channels is getting more expensive, while satisfied customers have no easy way to recommend the store. Marketing cannot measure word of mouth today, so it is neither encouraged nor funded.
 
+## As-is
+
+- Customers cannot invite friends or earn rewards for new customers.
+- Acquisition relies on paid channels only.
+
+## To-be
+
+- Each customer has a unique referral link.
+- A friend arriving through the link sees the discount before checkout.
+- The referrer is credited after the friend's first completed order.
+
 ## Personas
 
 - Returning customer: wants to recommend the store and be rewarded without asking support
@@ -21,6 +32,11 @@ Acquiring customers through paid channels is getting more expensive, while satis
 - Share of new customers acquired through referral: increase (baseline not provided)
 - Referral conversion rate (invited friends who place a first order): increase (baseline not provided)
 - Reward cost per referred customer: stay below the paid-channel acquisition cost
+
+## Systems and modules
+
+- Web store - Checkout
+- Customer account - Referral area
 
 ## In scope
 
@@ -41,6 +57,17 @@ Acquiring customers through paid channels is getting more expensive, while satis
 - The system must credit the referrer after the friend's first order is completed
 - The system must let the referrer see the status of each invitation
 - The system must block self-referral and repeated rewards for the same friend
+
+## Business rules
+
+- RN01: A referral link belongs to exactly one customer.
+- RN02: The referrer is credited only after the friend's first order is completed.
+- RN03: A customer cannot refer themselves, and a friend can trigger only one reward.
+
+## Expected returns
+
+- Experience: share of new customers acquired through referral
+- Financial: acquisition cost per customer (baseline not provided)
 
 ## Risks
 

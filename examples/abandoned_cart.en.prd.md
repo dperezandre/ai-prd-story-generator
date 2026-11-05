@@ -4,6 +4,17 @@
 
 Many shoppers add items to the cart and leave without paying. The store has no follow-up, so interested customers are lost, and any follow-up that is too aggressive risks annoying them and breaching consent rules.
 
+## As-is
+
+- Shoppers who leave items in the cart receive no contact.
+- Recovery depends on the shopper coming back on their own.
+
+## To-be
+
+- A signed-in shopper who abandons a cart receives a reminder email.
+- At most one follow-up is sent.
+- Following the link restores the cart.
+
 ## Personas
 
 - Hesitant shopper: left items in the cart and may return if reminded at the right moment
@@ -18,6 +29,11 @@ Many shoppers add items to the cart and leave without paying. The store has no f
 
 - Recovered cart rate (abandoned carts that end in a paid order): increase (baseline not provided)
 - Unsubscribe rate from reminder emails: stay low (threshold not provided)
+
+## Systems and modules
+
+- Web store - Cart
+- Email service - Transactional messages
 
 ## In scope
 
@@ -38,6 +54,17 @@ Many shoppers add items to the cart and leave without paying. The store has no f
 - The system must restore the cart contents when the shopper follows the email link
 - The system must stop reminders once the shopper completes a purchase
 - The system must honour an unsubscribe request in every reminder
+
+## Business rules
+
+- RN01: At most one follow-up reminder is sent per abandoned cart.
+- RN02: Reminders stop as soon as the shopper completes a purchase.
+- RN03: Every reminder carries a working unsubscribe link, and an unsubscribe is honoured immediately.
+
+## Expected returns
+
+- Operational efficiency: share of abandoned carts recovered (baseline not provided)
+- Experience: unsubscribe rate per reminder
 
 ## Risks
 

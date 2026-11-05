@@ -4,6 +4,17 @@
 
 Muitos compradores colocam itens no carrinho e saem sem pagar. A loja não faz nenhum acompanhamento, então clientes interessados são perdidos, e um acompanhamento agressivo demais pode incomodá-los e violar regras de consentimento.
 
+## Situação atual (AS IS)
+
+- Quem deixa itens no carrinho não recebe nenhum contato.
+- A recuperação depende de o cliente voltar sozinho.
+
+## Situação futura (TO BE)
+
+- O cliente logado que abandona o carrinho recebe um e-mail de lembrete.
+- No máximo um lembrete de acompanhamento é enviado.
+- Seguir o link restaura o carrinho.
+
 ## Personas
 
 - Comprador indeciso: deixou itens no carrinho e pode voltar se for lembrado no momento certo
@@ -18,6 +29,11 @@ Muitos compradores colocam itens no carrinho e saem sem pagar. A loja não faz n
 
 - Taxa de carrinhos recuperados (carrinhos abandonados que terminam em pedido pago): aumentar (linha de base não informada)
 - Taxa de descadastro dos e-mails de lembrete: manter baixa (limite não informado)
+
+## Sistemas e módulos
+
+- Loja online - Carrinho
+- Serviço de e-mail - Mensagens transacionais
 
 ## Dentro do escopo
 
@@ -38,6 +54,17 @@ Muitos compradores colocam itens no carrinho e saem sem pagar. A loja não faz n
 - O sistema deve restaurar o conteúdo do carrinho quando o comprador seguir o link do e-mail
 - O sistema deve interromper os lembretes quando o comprador concluir uma compra
 - O sistema deve respeitar o pedido de descadastro em todo lembrete
+
+## Regras de negócio
+
+- RN01: No máximo um lembrete de acompanhamento é enviado por carrinho abandonado.
+- RN02: Os lembretes param assim que o cliente conclui a compra.
+- RN03: Todo lembrete traz um link de descadastro funcional, e o descadastro é respeitado imediatamente.
+
+## Retornos esperados
+
+- Eficiência operacional: parcela de carrinhos abandonados recuperados (linha de base não informada)
+- Experiência: taxa de descadastro por lembrete
 
 ## Riscos
 

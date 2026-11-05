@@ -95,6 +95,10 @@ tests/              pytest suite (no network, no cost)
 
 Run the tests with `python -m pytest`.
 
+## Specification standard and review skill
+
+Business areas write specs in their own templates. [docs/spec-standard.md](docs/spec-standard.md) defines one structure (as-is/to-be, systems, numbered business rules, Gherkin criteria, expected returns, open questions) that the pipeline now generates, and the `po-spec-review` skill checks any spec against it: structure, contradictions, gaps, INVEST story breakdown and Gherkin. Install it for Claude Code with `python -m scripts.install_skill`, then ask Claude to run `/po-spec-review` on a spec file.
+
 ## Limitations
 
 - The bundled examples were **written and curated by hand** to show the intended output; they are not a transcript of a model run. Use `python -m scripts.generate_examples` to regenerate them with a real provider.

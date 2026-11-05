@@ -95,6 +95,10 @@ tests/              suíte pytest (sem rede, sem custo)
 
 Rode os testes com `python -m pytest`.
 
+## Padrão de especificação e skill de revisão
+
+Cada área de negócio escreve a especificação num modelo próprio. O [padrão de especificação](docs/spec-standard.pt-BR.md) define uma estrutura única (AS IS/TO BE, sistemas, regras de negócio numeradas, critérios em Gherkin, retornos esperados, perguntas em aberto) que o pipeline agora gera, e a skill `po-spec-review` confere qualquer especificação contra ele: estrutura, contradições, lacunas, quebra em histórias INVEST e Gherkin. Instale para o Claude Code com `python -m scripts.install_skill` e peça ao Claude para rodar `/po-spec-review` em um arquivo de especificação.
+
 ## Limitações
 
 - Os exemplos incluídos foram **escritos e curados à mão** para mostrar a saída pretendida; não são a transcrição de uma execução de modelo. Use `python -m scripts.generate_examples` para regenerá-los com um provedor real.

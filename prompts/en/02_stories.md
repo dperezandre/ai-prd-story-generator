@@ -18,7 +18,8 @@ You receive a PRD as JSON. Break its requirements into epics and user stories. E
 8. Stay inside the PRD's `scope_in`. Never create stories for `scope_out`. Do not invent requirements; if something is needed but missing, leave it out, since the PRD's `open_questions` already covers it.
 9. Keep stories independent where possible; avoid chains where one story cannot ship without another.
 10. Do not include Gherkin or acceptance criteria. Another step writes them.
-11. Output ONLY the JSON object. No markdown fences, no commentary.
+11. `rule_refs` lists the ids of the PRD `business_rules` the story must satisfy (e.g. ["RN01", "RN03"]). Use an empty list when the PRD has none. Never invent an id.
+12. Output ONLY the JSON object. No markdown fences, no commentary.
 
 # Output format
 
@@ -33,7 +34,8 @@ You receive a PRD as JSON. Break its requirements into epics and user stories. E
       "so_that": "value",
       "priority": "Must",
       "points": 3,
-      "prd_ref": "fragment of the PRD item"
+      "prd_ref": "fragment of the PRD item",
+      "rule_refs": ["RN01"]
     }
   ]
 }

@@ -44,6 +44,28 @@
     "open_questions": [
       "Qual é o tempo de espera certo antes do primeiro lembrete?",
       "Que registro de consentimento a loja mantém para e-mail de marketing?"
+    ],
+    "as_is": [
+      "Quem deixa itens no carrinho não recebe nenhum contato.",
+      "A recuperação depende de o cliente voltar sozinho."
+    ],
+    "to_be": [
+      "O cliente logado que abandona o carrinho recebe um e-mail de lembrete.",
+      "No máximo um lembrete de acompanhamento é enviado.",
+      "Seguir o link restaura o carrinho."
+    ],
+    "systems": [
+      "Loja online - Carrinho",
+      "Serviço de e-mail - Mensagens transacionais"
+    ],
+    "business_rules": [
+      "RN01: No máximo um lembrete de acompanhamento é enviado por carrinho abandonado.",
+      "RN02: Os lembretes param assim que o cliente conclui a compra.",
+      "RN03: Todo lembrete traz um link de descadastro funcional, e o descadastro é respeitado imediatamente."
+    ],
+    "expected_returns": [
+      "Eficiência operacional: parcela de carrinhos abandonados recuperados (linha de base não informada)",
+      "Experiência: taxa de descadastro por lembrete"
     ]
   },
   "stories": [
@@ -57,6 +79,7 @@
       "priority": "Must",
       "points": 5,
       "prd_ref": "requirements: enviar e-mail de lembrete ao comprador autenticado",
+      "rule_refs": [],
       "scenarios": [
         {
           "name": "O lembrete é enviado após o tempo de espera",
@@ -94,6 +117,9 @@
       "priority": "Should",
       "points": 3,
       "prd_ref": "requirements: enviar no máximo um lembrete de acompanhamento",
+      "rule_refs": [
+        "RN01"
+      ],
       "scenarios": [
         {
           "name": "O acompanhamento é enviado uma vez",
@@ -131,6 +157,7 @@
       "priority": "Must",
       "points": 5,
       "prd_ref": "requirements: restaurar o conteúdo do carrinho",
+      "rule_refs": [],
       "scenarios": [
         {
           "name": "O carrinho é restaurado",
@@ -170,6 +197,9 @@
       "priority": "Must",
       "points": 2,
       "prd_ref": "requirements: respeitar o pedido de descadastro",
+      "rule_refs": [
+        "RN03"
+      ],
       "scenarios": [
         {
           "name": "O descadastro vale imediatamente",
@@ -208,6 +238,9 @@
       "priority": "Should",
       "points": 3,
       "prd_ref": "requirements: interromper os lembretes quando o comprador concluir uma compra",
+      "rule_refs": [
+        "RN02"
+      ],
       "scenarios": [
         {
           "name": "O lembrete para após a compra",
@@ -274,6 +307,9 @@
         "priority": "Should",
         "points": 3,
         "prd_ref": "requirements: enviar no máximo um lembrete de acompanhamento",
+        "rule_refs": [
+          "RN01"
+        ],
         "scenarios": []
       },
       "scores_after": {
@@ -307,6 +343,7 @@
         "priority": "Must",
         "points": 5,
         "prd_ref": "requirements: restaurar o conteúdo do carrinho",
+        "rule_refs": [],
         "scenarios": []
       },
       "scores_after": {

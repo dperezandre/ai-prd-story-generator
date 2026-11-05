@@ -17,7 +17,12 @@ Transforme a ideia de funcionalidade recebida em um PRD (Product Requirements Do
 7. `requirements` são afirmações testáveis ("O sistema deve ..."), cada uma rastreável a um objetivo. Mantenha de 5 a 12.
 8. Tudo o que você inferir e a ideia não disser vai em `assumptions`. Tudo o que você não puder decidir vai em `open_questions`. Nunca apresente uma premissa como se fosse fato.
 9. `risks`: de 2 a 5 riscos reais (adoção, jurídico, técnico, dependência), cada um com uma mitigação de uma linha após um travessão.
-10. Responda SOMENTE com o objeto JSON. Sem cercas de markdown, sem comentários.
+10. `as_is`: de 2 a 5 afirmações factuais sobre como funciona hoje, apenas com o que a ideia diz. Se a ideia não descrever a situação atual, deixe vazio e registre a dúvida em `open_questions`.
+11. `to_be`: de 2 a 6 afirmações do comportamento futuro em termos observáveis (o que cada ator vê ou pode fazer).
+12. `systems`: sistemas e módulos envolvidos, cada um no formato "Sistema - Módulo". Liste só os que a ideia cita; o que você inferir vai em `assumptions`.
+13. `business_rules`: regras atômicas e testáveis numeradas "RN01: ...", "RN02: ...", uma regra por item. Requisitos dizem o que o sistema deve oferecer; regras dizem condições e restrições sobre isso. Não repita um requisito como regra.
+14. `expected_returns`: cada item começa pelo tipo (Melhoria assistencial, Eficiência operacional, Financeiro ou Experiência) seguido do indicador que ele moveria. Não invente números; se a ideia não trouxer indicador, pergunte em `open_questions`.
+15. Responda SOMENTE com o objeto JSON. Sem cercas de markdown, sem comentários.
 
 # Formato de saída
 
@@ -34,7 +39,12 @@ Um único objeto JSON com exatamente estas chaves (os nomes das chaves ficam em 
   "requirements": ["..."],
   "risks": ["..."],
   "assumptions": ["..."],
-  "open_questions": ["..."]
+  "open_questions": ["..."],
+  "as_is": ["..."],
+  "to_be": ["..."],
+  "systems": ["Sistema - Módulo"],
+  "business_rules": ["RN01: ..."],
+  "expected_returns": ["Eficiência operacional: indicador"]
 }
 
 # Exemplos

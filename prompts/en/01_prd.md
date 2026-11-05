@@ -17,7 +17,12 @@ Turn the feature idea you receive into a Product Requirements Document (PRD). Th
 7. `requirements` are testable statements ("The system must ..."), each one traceable to a goal. Keep 5-12 of them.
 8. Everything you infer that the idea does not state goes in `assumptions`. Everything you cannot decide goes in `open_questions`. Never present an assumption as a fact.
 9. `risks`: 2-5 real risks (adoption, legal, technical, dependency), each with a one-line mitigation after a dash.
-10. Output ONLY the JSON object. No markdown fences, no commentary.
+10. `as_is`: 2 to 5 factual statements about how things work today, only from what the idea says. If the idea does not describe the current situation, leave it empty and add the question to `open_questions`.
+11. `to_be`: 2 to 6 statements describing the future behavior in observable terms (what each actor sees or can do).
+12. `systems`: systems and modules involved, each as "System - Module". List only those the idea names; anything you infer goes in `assumptions`.
+13. `business_rules`: atomic, testable rules numbered "RN01: ...", "RN02: ...", one rule per item. Requirements say what the system must offer; rules state conditions and restrictions on it. Do not repeat a requirement as a rule.
+14. `expected_returns`: each item starts with its type (Care improvement, Operational efficiency, Financial or Experience) followed by the indicator it would move. Do not invent numbers; if the idea gives no indicator, ask in `open_questions`.
+15. Output ONLY the JSON object. No markdown fences, no commentary.
 
 # Output format
 
@@ -34,7 +39,12 @@ A single JSON object with exactly these keys:
   "requirements": ["..."],
   "risks": ["..."],
   "assumptions": ["..."],
-  "open_questions": ["..."]
+  "open_questions": ["..."],
+  "as_is": ["..."],
+  "to_be": ["..."],
+  "systems": ["System - Module"],
+  "business_rules": ["RN01: ..."],
+  "expected_returns": ["Operational efficiency: indicator"]
 }
 
 # Examples

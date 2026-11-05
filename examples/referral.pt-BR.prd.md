@@ -4,6 +4,17 @@
 
 Conquistar clientes por canais pagos está cada vez mais caro, e clientes satisfeitos não têm um jeito simples de recomendar a loja. O marketing hoje não consegue medir o boca a boca, então ele não é incentivado nem financiado.
 
+## Situação atual (AS IS)
+
+- Clientes não conseguem convidar amigos nem ganhar recompensa por novos clientes.
+- A aquisição depende só de canais pagos.
+
+## Situação futura (TO BE)
+
+- Cada cliente tem um link de indicação único.
+- O amigo que chega pelo link vê o desconto antes do checkout.
+- Quem indicou recebe o crédito depois do primeiro pedido concluído do amigo.
+
 ## Personas
 
 - Cliente recorrente: quer recomendar a loja e ser recompensado sem precisar falar com o suporte
@@ -21,6 +32,11 @@ Conquistar clientes por canais pagos está cada vez mais caro, e clientes satisf
 - Participação de novos clientes adquiridos por indicação: aumentar (linha de base não informada)
 - Taxa de conversão de indicados (amigos convidados que fazem o primeiro pedido): aumentar (linha de base não informada)
 - Custo de recompensa por cliente indicado: ficar abaixo do custo de aquisição em canais pagos
+
+## Sistemas e módulos
+
+- Loja online - Checkout
+- Conta do cliente - Área de indicação
 
 ## Dentro do escopo
 
@@ -41,6 +57,17 @@ Conquistar clientes por canais pagos está cada vez mais caro, e clientes satisf
 - O sistema deve creditar quem indicou depois que o primeiro pedido do amigo for concluído
 - O sistema deve permitir que quem indica veja o status de cada convite
 - O sistema deve bloquear autoindicação e recompensas repetidas para o mesmo amigo
+
+## Regras de negócio
+
+- RN01: Um link de indicação pertence a exatamente um cliente.
+- RN02: Quem indicou só recebe o crédito depois que o primeiro pedido do amigo é concluído.
+- RN03: Um cliente não pode indicar a si mesmo, e um amigo só pode gerar uma recompensa.
+
+## Retornos esperados
+
+- Experiência: participação de novos clientes adquiridos por indicação
+- Financeiro: custo de aquisição por cliente (linha de base não informada)
 
 ## Riscos
 

@@ -47,6 +47,28 @@
     "open_questions": [
       "What are the reward amounts and who funds them?",
       "What is today's acquisition cost per customer, to set the break-even point?"
+    ],
+    "as_is": [
+      "Customers cannot invite friends or earn rewards for new customers.",
+      "Acquisition relies on paid channels only."
+    ],
+    "to_be": [
+      "Each customer has a unique referral link.",
+      "A friend arriving through the link sees the discount before checkout.",
+      "The referrer is credited after the friend's first completed order."
+    ],
+    "systems": [
+      "Web store - Checkout",
+      "Customer account - Referral area"
+    ],
+    "business_rules": [
+      "RN01: A referral link belongs to exactly one customer.",
+      "RN02: The referrer is credited only after the friend's first order is completed.",
+      "RN03: A customer cannot refer themselves, and a friend can trigger only one reward."
+    ],
+    "expected_returns": [
+      "Experience: share of new customers acquired through referral",
+      "Financial: acquisition cost per customer (baseline not provided)"
     ]
   },
   "stories": [
@@ -60,6 +82,9 @@
       "priority": "Must",
       "points": 3,
       "prd_ref": "requirements: unique referral link",
+      "rule_refs": [
+        "RN01"
+      ],
       "scenarios": [
         {
           "name": "Referral link is copied for sharing",
@@ -98,6 +123,10 @@
       "priority": "Must",
       "points": 5,
       "prd_ref": "requirements: credit the referrer after the friend's first order",
+      "rule_refs": [
+        "RN02",
+        "RN03"
+      ],
       "scenarios": [
         {
           "name": "Referrer is credited after the first paid order",
@@ -150,6 +179,7 @@
       "priority": "Must",
       "points": 3,
       "prd_ref": "requirements: show the friend's discount before checkout",
+      "rule_refs": [],
       "scenarios": [
         {
           "name": "Discount is shown on arrival",
@@ -201,6 +231,7 @@
       "priority": "Should",
       "points": 5,
       "prd_ref": "requirements: let the referrer see invitation status",
+      "rule_refs": [],
       "scenarios": [
         {
           "name": "Referrer sees each stage",
@@ -238,6 +269,9 @@
       "priority": "Should",
       "points": 5,
       "prd_ref": "requirements: block self-referral and repeated rewards",
+      "rule_refs": [
+        "RN03"
+      ],
       "scenarios": [
         {
           "name": "Same customer cannot reward themselves",
@@ -320,6 +354,7 @@
         "priority": "Must",
         "points": 3,
         "prd_ref": "requirements: show the friend's discount before checkout",
+        "rule_refs": [],
         "scenarios": []
       },
       "scores_after": {
@@ -353,6 +388,7 @@
         "priority": "Should",
         "points": 5,
         "prd_ref": "requirements: let the referrer see invitation status",
+        "rule_refs": [],
         "scenarios": []
       },
       "scores_after": {

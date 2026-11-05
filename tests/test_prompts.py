@@ -10,9 +10,10 @@ HEADINGS = {
 }
 OUTPUT_KEYS = {
     "01_prd.md": ["title", "problem", "personas", "goals", "success_metrics", "scope_in",
-                  "scope_out", "requirements", "risks", "assumptions", "open_questions"],
+                  "scope_out", "requirements", "risks", "assumptions", "open_questions",
+                  "as_is", "to_be", "systems", "business_rules", "expected_returns"],
     "02_stories.md": ["stories", "id", "epic", "as_a", "i_want", "so_that", "priority",
-                      "points", "prd_ref"],
+                      "points", "prd_ref", "rule_refs"],
     "03_invest_review.md": ["reviews", "story_id", "scores", "independent", "negotiable",
                             "valuable", "estimable", "small", "testable", "verdict",
                             "rewrite", "scores_after"],

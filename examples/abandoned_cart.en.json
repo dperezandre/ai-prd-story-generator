@@ -44,6 +44,28 @@
     "open_questions": [
       "What is the right waiting time before the first reminder?",
       "Which consent record does the store keep for marketing email?"
+    ],
+    "as_is": [
+      "Shoppers who leave items in the cart receive no contact.",
+      "Recovery depends on the shopper coming back on their own."
+    ],
+    "to_be": [
+      "A signed-in shopper who abandons a cart receives a reminder email.",
+      "At most one follow-up is sent.",
+      "Following the link restores the cart."
+    ],
+    "systems": [
+      "Web store - Cart",
+      "Email service - Transactional messages"
+    ],
+    "business_rules": [
+      "RN01: At most one follow-up reminder is sent per abandoned cart.",
+      "RN02: Reminders stop as soon as the shopper completes a purchase.",
+      "RN03: Every reminder carries a working unsubscribe link, and an unsubscribe is honoured immediately."
+    ],
+    "expected_returns": [
+      "Operational efficiency: share of abandoned carts recovered (baseline not provided)",
+      "Experience: unsubscribe rate per reminder"
     ]
   },
   "stories": [
@@ -57,6 +79,7 @@
       "priority": "Must",
       "points": 5,
       "prd_ref": "requirements: send a reminder email to a signed-in shopper",
+      "rule_refs": [],
       "scenarios": [
         {
           "name": "Reminder is sent after the waiting time",
@@ -94,6 +117,9 @@
       "priority": "Should",
       "points": 3,
       "prd_ref": "requirements: send at most one follow-up reminder",
+      "rule_refs": [
+        "RN01"
+      ],
       "scenarios": [
         {
           "name": "Follow-up is sent once",
@@ -131,6 +157,7 @@
       "priority": "Must",
       "points": 5,
       "prd_ref": "requirements: restore the cart contents",
+      "rule_refs": [],
       "scenarios": [
         {
           "name": "Cart is restored",
@@ -170,6 +197,9 @@
       "priority": "Must",
       "points": 2,
       "prd_ref": "requirements: honour an unsubscribe request",
+      "rule_refs": [
+        "RN03"
+      ],
       "scenarios": [
         {
           "name": "Unsubscribe takes effect immediately",
@@ -208,6 +238,9 @@
       "priority": "Should",
       "points": 3,
       "prd_ref": "requirements: stop reminders once the shopper completes a purchase",
+      "rule_refs": [
+        "RN02"
+      ],
       "scenarios": [
         {
           "name": "Reminder stops after purchase",
@@ -274,6 +307,9 @@
         "priority": "Should",
         "points": 3,
         "prd_ref": "requirements: send at most one follow-up reminder",
+        "rule_refs": [
+          "RN01"
+        ],
         "scenarios": []
       },
       "scores_after": {
@@ -307,6 +343,7 @@
         "priority": "Must",
         "points": 5,
         "prd_ref": "requirements: restore the cart contents",
+        "rule_refs": [],
         "scenarios": []
       },
       "scores_after": {

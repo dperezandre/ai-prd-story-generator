@@ -18,7 +18,8 @@ Você recebe um PRD em JSON. Quebre os requisitos dele em épicos e histórias d
 8. Fique dentro do `scope_in` do PRD. Nunca crie histórias para o `scope_out`. Não invente requisitos; se algo for necessário mas estiver faltando, deixe de fora, pois as `open_questions` do PRD já cobrem isso.
 9. Mantenha as histórias independentes sempre que possível; evite cadeias em que uma história não pode ser entregue sem outra.
 10. Não inclua Gherkin nem critérios de aceite. Outra etapa os escreve.
-11. Responda SOMENTE com o objeto JSON. Sem cercas de markdown, sem comentários.
+11. `rule_refs` lista os ids das `business_rules` do PRD que a história deve cumprir (ex.: ["RN01", "RN03"]). Use lista vazia quando o PRD não tiver regras. Nunca invente um id.
+12. Responda SOMENTE com o objeto JSON. Sem cercas de markdown, sem comentários.
 
 # Formato de saída
 
@@ -33,7 +34,8 @@ Você recebe um PRD em JSON. Quebre os requisitos dele em épicos e histórias d
       "so_that": "valor",
       "priority": "Must",
       "points": 3,
-      "prd_ref": "trecho do item do PRD"
+      "prd_ref": "trecho do item do PRD",
+      "rule_refs": ["RN01"]
     }
   ]
 }

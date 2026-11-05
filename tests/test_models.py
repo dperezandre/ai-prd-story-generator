@@ -53,3 +53,25 @@ def test_result_roundtrips_json():
     r = PipelineResult(idea="i", language="en", prd=PRD(title="T", problem="P"),
                        stories=[make_story(scenarios=[Scenario(name="n", given=["a"], when=["b"], then=["c"])])])
     assert PipelineResult.model_validate_json(r.model_dump_json()) == r
+
+
+def test_prd_markdown_renders_standard_spec_sections_in_order():
+    prd = PRD(title="T", problem="P", as_is=["a"], to_be=["b"], systems=["S - M"],
+              business_rules=["RN01: r"], expected_returns=["Operational efficiency"],
+              goals=["g"])
+    en = prd.to_markdown("en")
+    pt = prd.to_markdown("pt-BR")
+    for heading in ("## As-is", "## To-be", "## Systems and modules",
+                    "## Business rules", "## Expected returns"):
+        assert heading in en
+    for heading in ("## Situação atual (AS IS)", "## Situação futura (TO BE)",
+                    "## Sistemas e módulos", "## Regras de negócio", "## Retornos esperados"):
+        assert heading in pt
+    assert en.index("## As-is") < en.index("## To-be") < en.index("## Goals")
+    assert en.index("## Business rules") < en.index("## Expected returns")
+
+
+def test_story_rule_refs_default_empty_and_roundtrip():
+    assert make_story().rule_refs == []
+    s = make_story(rule_refs=["RN01", "RN03"])
+    assert Story.model_validate_json(s.model_dump_json()).rule_refs == ["RN01", "RN03"]
