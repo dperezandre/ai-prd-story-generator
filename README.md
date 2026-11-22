@@ -97,7 +97,7 @@ Run the tests with `python -m pytest`.
 
 ## Push to Azure DevOps
 
-Every story is generated with its **tasks** (2 to 6, no estimates). A button in the app's Export tab, the `po-spec-review` skill and a command (`python -m scripts.azure_push`) can create the stories and their tasks in an Azure DevOps project through its REST API: preview first, then send only after you confirm, and a repeated send never duplicates work items. The token comes from the `AZDO_PAT` environment variable or a password field and is never stored. See [docs/azure-push.md](docs/azure-push.md). It has been tested with simulated responses only; try a sandbox project first.
+Every story is generated with its **tasks** (2 to 6, no estimates). A button in the app's Export tab, the `po-spec-review` skill and a command (`python -m scripts.azure_push`) can create the stories and their tasks in an Azure DevOps project through its REST API: preview first, then send only after you confirm, and a repeated send skips what a ledger file recorded as already created. The token comes from the `AZDO_PAT` environment variable or a password field and is never stored. See [docs/azure-push.md](docs/azure-push.md). It has been tested with simulated responses only; try a sandbox project first.
 
 ## Specification standard and review skill
 

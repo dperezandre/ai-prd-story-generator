@@ -38,11 +38,11 @@ python -m scripts.azure_push stories.json --org <organization> --project <projec
 
 Options: `--area` and `--iteration` set the area and iteration paths (default: the project root); `--ledger PATH` chooses where the ledger is kept.
 
-What happens: the project's story type is detected (User Story, Product Backlog Item, Requirement or Issue), then each story is created, then its tasks with a parent link. Optional fields (acceptance criteria, story points or effort, priority) are sent only if the project's process has them.
+What happens: the project's story type is detected (User Story, Product Backlog Item, Requirement or Issue), then each story is created, then its tasks with a parent link. Optional fields (acceptance criteria, story points or effort, priority) are sent only if the project's process has them. If the process has no Acceptance Criteria field (for example Basic), the criteria are appended to the story description under a heading instead of being dropped.
 
 ## What the ledger does
 
-After every created work item the command writes a small file next to the input (`<name>.azdo-ledger.json`). If you run it again, finished stories are skipped, and a story that lost some tasks to an error only gets the missing ones. Nothing is duplicated. `--force` ignores the ledger and creates everything again.
+After every created work item the command writes a small file next to the input (`<name>.azdo-ledger.json`). If you run it again, finished stories are skipped, and a story that lost some tasks to an error only gets the missing ones. Nothing the ledger recorded is created again. Duplicates are still possible if a request times out after Azure already created the item, or if you regenerate the stories with different text (they count as new stories). Two identical stories in the same input are rejected. `--force` ignores the ledger and creates everything again.
 
 ## From the app and from the skill
 

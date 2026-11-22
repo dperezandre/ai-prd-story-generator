@@ -504,3 +504,81 @@ def test_push_with_no_items_makes_no_request():
     client, rec, _, ledger = push_setup([])
     report = push(client, [], ledger, confirmed=True)
     assert rec.requests == [] and report.created_stories == 0 and report.error is None
+
+
+# ---- final review fixes ------------------------------------------------------------------------
+
+
+def test_302_redirect_to_sign_in_is_auth_error_not_a_crash():
+    client, _ = client_for(lambda r: respond(302, text="", headers={
+        "location": "https://login.example/signin", "content-type": "text/html"}))
+    with pytest.raises(AzureDevOpsError) as err:
+        client.story_type()
+    assert err.value.kind == "auth"
+
+
+def test_client_asks_azure_not_to_redirect_to_the_sign_in_page():
+    client, rec = client_for(lambda r: respond(data=TYPES))
+    client.story_type()
+    assert rec.requests[0].headers["x-tfs-fedauthredirect"] == "Suppress"
+
+
+def test_unreadable_json_body_is_an_azure_error_not_a_crash():
+    client, _ = client_for(lambda r: httpx.Response(200, text="{bad", headers={"content-type": "application/json"}))
+    with pytest.raises(AzureDevOpsError):
+        client.story_type()
+
+
+def test_created_work_item_without_id_is_an_azure_error():
+    client, _ = client_for(lambda r: respond(data={}))
+    with pytest.raises(AzureDevOpsError):
+        client.create_story(an_item(), "User Story", set())
+
+
+def test_unwritable_ledger_stops_before_any_request(tmp_path):
+    blocker = tmp_path / "blocker"
+    blocker.write_text("a file where a folder is needed", encoding="utf-8")
+    items = two_items()
+    client, rec, _, ledger = push_setup(items, ledger_path=blocker / "ledger.json")
+    report = push(client, items, ledger, confirmed=True)
+    assert report.error is not None and "ledger" in str(report.error).lower()
+    assert rec.requests == [] and report.created_stories == 0
+
+
+def test_identical_stories_are_rejected_before_any_request():
+    items = items_from_result(result([story(1), story(1)]))
+    client, rec, _, ledger = push_setup(items)
+    with pytest.raises(ValueError, match="identical"):
+        push(client, items, ledger, confirmed=True)
+    assert rec.requests == []
+    assert plan(items, ledger)[1].warning and "identical" in plan(items, ledger)[1].warning
+
+
+def test_post_is_not_retried_on_a_server_error(monkeypatch):
+    monkeypatch.setattr("src.azure_devops._sleep", lambda s: None)
+    client, rec = client_for(lambda r: respond(503, data={}))
+    with pytest.raises(AzureDevOpsError):
+        client.create_story(an_item(), "User Story", set())
+    assert len(rec.requests) == 1
+
+
+def test_post_is_still_retried_on_429(monkeypatch):
+    monkeypatch.setattr("src.azure_devops._sleep", lambda s: None)
+    replies = iter([respond(429, headers={"retry-after": "0"}), respond(data={"id": 5})])
+    client, rec = client_for(lambda r: next(replies))
+    assert client.create_story(an_item(), "User Story", set()) == 5
+    assert len(rec.requests) == 2
+
+
+def test_criteria_move_into_the_description_when_the_type_has_no_criteria_field():
+    _, rec = create_story_request(set())
+    description = ops_by_path(rec)["/fields/System.Description"]
+    assert description.startswith("<p>d</p>") and "<p>ac</p>" in description
+    assert "Acceptance criteria" in description
+
+
+def test_criteria_heading_follows_the_language():
+    pt = items_from_result(result([story(1)], "pt-BR"))[0]
+    assert pt.criteria_heading == "Critérios de aceite"
+    assert items_from_result(result([story(1)]))[0].criteria_heading == "Acceptance criteria"
+    assert items_from_stories_json(SKILL_JSON)[0].criteria_heading == "Critérios de aceite"

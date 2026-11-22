@@ -211,3 +211,25 @@ def test_missing_fields_show_error_without_calling_azure(monkeypatch):
     by_key(at.button, "azdo_preview").click().run()
     by_key(at.button, "azdo_send").click().run()
     assert not at.exception and FakeAzureClient.instances == []
+
+
+def test_stories_tab_lists_each_story_tasks_in_demo_mode():
+    at = fresh()
+    by_key(at.button, "generate").click().run()
+    assert not at.exception
+    text = "\n".join(str(m.value) for m in at.markdown)
+    assert "Gerar um código de indicação único por cliente" in text
+
+
+def test_azure_preview_shows_the_no_tasks_warning(monkeypatch):
+    import json
+
+    import src.azure_devops
+    from tests.test_pipeline import good_responses
+    replies = good_responses()
+    replies[4] = json.dumps({"tasks": {"S1": [{"title": "Only one", "description": "d"}]}})
+    FakeAzureClient.instances, FakeAzureClient.fail = [], None
+    monkeypatch.setattr(src.azure_devops, "AzureDevOpsClient", FakeAzureClient)
+    at = live_run(monkeypatch, replies)
+    by_key(at.button, "azdo_preview").click().run()
+    assert "no tasks" in all_text(at).lower()

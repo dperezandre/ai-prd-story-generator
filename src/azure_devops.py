@@ -14,6 +14,7 @@ from src.exporters import _MOSCOW_SLUG, _html_paragraph, _scenario_blocks
 from src.models import PipelineResult, Priority
 
 _PRIORITY: dict[Priority, int] = {"Must": 1, "Should": 2, "Could": 3, "Won't": 4}
+_CRITERIA_HEADING = {"en": "Acceptance criteria", "pt-BR": "Critérios de aceite"}
 
 _API_VERSION = "7.1"
 _STORY_TYPES = ("User Story", "Product Backlog Item", "Requirement", "Issue")
@@ -49,6 +50,7 @@ class PushItem:
     points: int | None
     tags: list[str] = field(default_factory=list)
     tasks: list[PushTask] = field(default_factory=list)
+    criteria_heading: str = "Acceptance criteria"  # used when the project has no criteria field
 
 
 @dataclass(frozen=True)
@@ -74,6 +76,7 @@ def items_from_result(result: PipelineResult) -> list[PushItem]:
             points=s.points,
             tags=[f"MoSCoW-{_MOSCOW_SLUG[s.priority].capitalize()}", s.epic],
             tasks=[PushTask(t.title, _task_html(t.description)) for t in s.tasks],
+            criteria_heading=_CRITERIA_HEADING[result.language],
         ))
     return items
 
@@ -92,6 +95,7 @@ def items_from_stories_json(data: dict) -> list[PushItem]:
             priority=None,
             points=None,
             tasks=[PushTask(t["title"], _task_html(t.get("description", ""))) for t in story["tasks"]],
+            criteria_heading=_CRITERIA_HEADING["pt-BR"],
         ))
     return items
 
@@ -161,7 +165,9 @@ class Ledger:
 def plan(items: list[PushItem], ledger: Ledger) -> list[PlanLine]:
     """Preview of what a push would do. Makes no request."""
     lines = []
+    seen: set[str] = set()
     for item in items:
+        key = item_key(ledger.organization, ledger.project, item)
         entry = ledger.get(item)
         if entry is None:
             status = "new"
@@ -169,12 +175,15 @@ def plan(items: list[PushItem], ledger: Ledger) -> list[PlanLine]:
             status = "sent"
         else:
             status = "partial"
-        lines.append(PlanLine(
-            story_title=item.title,
-            task_titles=[t.title for t in item.tasks],
-            status=status,
-            warning=None if item.tasks else "This story has no tasks.",
-        ))
+        if key in seen:
+            warning = "This story is identical to an earlier one and cannot be sent twice."
+        elif not item.tasks:
+            warning = "This story has no tasks."
+        else:
+            warning = None
+        seen.add(key)
+        lines.append(PlanLine(story_title=item.title, task_titles=[t.title for t in item.tasks],
+                              status=status, warning=warning))
     return lines
 
 
@@ -194,8 +203,10 @@ class AzureDevOpsClient:
         self._area = area
         self._iteration = iteration
         credentials = base64.b64encode(f":{self._pat}".encode()).decode()
-        self._client = httpx.Client(transport=transport, timeout=_TIMEOUT,
-                                    headers={"Authorization": f"Basic {credentials}"})
+        self._client = httpx.Client(transport=transport, timeout=_TIMEOUT, headers={
+            "Authorization": f"Basic {credentials}",
+            # Ask for a 401 instead of a redirect to the sign-in page when the token is rejected.
+            "X-TFS-FedAuthRedirect": "Suppress"})
 
     # -- helpers ----------------------------------------------------------------------------
 
@@ -225,7 +236,9 @@ class AzureDevOpsClient:
                 raise AzureDevOpsError("Azure DevOps timed out. Try again.", "network") from None
             except httpx.HTTPError:
                 raise AzureDevOpsError("Could not reach Azure DevOps. Check your connection.", "network") from None
-            if (resp.status_code == 429 or resp.status_code >= 500) and attempt == 1:
+            # A 429 was refused before processing; a 5xx on a write may have been committed, so only reads retry it.
+            retryable = resp.status_code == 429 or (resp.status_code >= 500 and method == "GET")
+            if retryable and attempt == 1:
                 try:
                     wait = float(resp.headers.get("retry-after", "1"))
                 except ValueError:
@@ -237,7 +250,7 @@ class AzureDevOpsClient:
 
     def _parse(self, resp: httpx.Response) -> dict:
         status = resp.status_code
-        if status == 203 or (status < 300 and "json" not in resp.headers.get("content-type", "")):
+        if status == 203 or (status < 400 and "json" not in resp.headers.get("content-type", "")):
             raise AzureDevOpsError(
                 "Azure DevOps rejected the token (it answered with a sign-in page). "
                 "Check the token, its expiry and that it has Work Items read and write.", "auth")
@@ -254,12 +267,26 @@ class AzureDevOpsClient:
             raise AzureDevOpsError(f"Azure DevOps had a server error ({status}). Try again.", "network")
         if status >= 400:
             raise AzureDevOpsError(f"Azure DevOps refused the request{suffix or f' ({status})'}.", "validation")
-        return resp.json()
+        try:
+            data = resp.json()
+        except ValueError:
+            raise self._unexpected() from None
+        if not isinstance(data, dict):
+            raise self._unexpected()
+        return data
+
+    @staticmethod
+    def _unexpected() -> AzureDevOpsError:
+        return AzureDevOpsError("Azure DevOps sent a response this tool could not read.", "validation")
 
     # -- reads ------------------------------------------------------------------------------
 
     def story_type(self) -> str:
-        names = {t["name"] for t in self._request("GET", "workitemtypes")["value"]}
+        data = self._request("GET", "workitemtypes")
+        try:
+            names = {t["name"] for t in data["value"]}
+        except (KeyError, TypeError):
+            raise self._unexpected() from None
         for candidate in _STORY_TYPES:
             if candidate in names:
                 return candidate
@@ -268,7 +295,10 @@ class AzureDevOpsClient:
 
     def available_fields(self, work_item_type: str) -> set[str]:
         data = self._request("GET", f"workitemtypes/{quote(work_item_type)}/fields")
-        return {f["referenceName"] for f in data["value"]}
+        try:
+            return {f["referenceName"] for f in data["value"]}
+        except (KeyError, TypeError):
+            raise self._unexpected() from None
 
     # -- writes -----------------------------------------------------------------------------
 
@@ -283,13 +313,22 @@ class AzureDevOpsClient:
                 "rel": "System.LinkTypes.Hierarchy-Reverse",
                 "url": f"https://dev.azure.com/{quote(self.organization)}/_apis/wit/workItems/{parent_id}"}})
         data = self._request("POST", f"workitems/{quote('$' + work_item_type, safe='$')}", body=body)
-        return int(data["id"])
+        try:
+            return int(data["id"])
+        except (KeyError, TypeError, ValueError):
+            raise self._unexpected() from None
 
     def create_story(self, item: PushItem, story_type: str, available: set[str]) -> int:
-        fields: list[tuple[str, object]] = [("System.Title", item.title),
-                                            ("System.Description", item.description_html)]
-        if item.acceptance_html and "Microsoft.VSTS.Common.AcceptanceCriteria" in available:
-            fields.append(("Microsoft.VSTS.Common.AcceptanceCriteria", item.acceptance_html))
+        description = item.description_html
+        criteria_field = None
+        if item.acceptance_html:
+            if "Microsoft.VSTS.Common.AcceptanceCriteria" in available:
+                criteria_field = ("Microsoft.VSTS.Common.AcceptanceCriteria", item.acceptance_html)
+            else:  # keep the criteria instead of losing them on processes without the field
+                description += f"<h3>{item.criteria_heading}</h3>{item.acceptance_html}"
+        fields: list[tuple[str, object]] = [("System.Title", item.title), ("System.Description", description)]
+        if criteria_field:
+            fields.append(criteria_field)
         if item.priority is not None and "Microsoft.VSTS.Common.Priority" in available:
             fields.append(("Microsoft.VSTS.Common.Priority", item.priority))
         if item.points is not None:
@@ -319,6 +358,15 @@ class PushReport:
     error: AzureDevOpsError | None = None
 
 
+def _save(ledger: Ledger) -> None:
+    try:
+        ledger.save()
+    except OSError:
+        raise AzureDevOpsError(
+            f"Could not write the ledger file {ledger.path}. Fix the path and run again; "
+            "no more work items were created.", "validation") from None
+
+
 def push(client: AzureDevOpsClient, items: list[PushItem], ledger: Ledger,
          confirmed: bool, force: bool = False) -> PushReport:
     """Create the stories and their tasks. Stops at the first Azure error and reports what was created.
@@ -329,7 +377,12 @@ def push(client: AzureDevOpsClient, items: list[PushItem], ledger: Ledger,
     report = PushReport()
     if not items:
         return report
+    keys = [item_key(ledger.organization, ledger.project, item) for item in items]
+    if len(set(keys)) != len(keys):
+        raise ValueError("Some stories are identical (same title, description and criteria). "
+                         "Remove the duplicates before sending.")
     try:
+        _save(ledger)  # fail before creating anything if the ledger cannot be written
         story_type = client.story_type()
         available = client.available_fields(story_type)
         for item in items:
@@ -338,7 +391,7 @@ def push(client: AzureDevOpsClient, items: list[PushItem], ledger: Ledger,
                 story_id = client.create_story(item, story_type, available)
                 task_ids: list[int] = []
                 ledger.record(item, story_id, task_ids)
-                ledger.save()
+                _save(ledger)
                 report.created_stories += 1
                 report.urls.append(client.work_item_url(story_id))
             else:
@@ -349,7 +402,7 @@ def push(client: AzureDevOpsClient, items: list[PushItem], ledger: Ledger,
             for task in item.tasks[len(task_ids):]:
                 task_ids.append(client.create_task(task, story_id))
                 ledger.record(item, story_id, task_ids)
-                ledger.save()
+                _save(ledger)
                 report.created_tasks += 1
     except AzureDevOpsError as err:
         report.error = err

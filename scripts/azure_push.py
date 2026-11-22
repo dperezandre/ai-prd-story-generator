@@ -78,7 +78,11 @@ def main(argv: list[str] | None = None, transport: httpx.BaseTransport | None = 
     except ValueError as err:
         print(f"Error: {err}", file=sys.stderr)
         return 2
-    report = push(client, items, ledger, confirmed=True, force=args.force)
+    try:
+        report = push(client, items, ledger, confirmed=True, force=args.force)
+    except ValueError as err:
+        print(f"Error: {err}", file=sys.stderr)
+        return 2
     print(f"Created {report.created_stories} stories and {report.created_tasks} tasks; "
           f"{report.skipped} skipped (already sent).")
     for url in report.urls:

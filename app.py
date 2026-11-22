@@ -30,7 +30,7 @@ TEXT = {
         "no_key": "Enter an API key in the sidebar, or turn on demo mode.",
         "tabs": ["PRD", "Stories", "Gherkin", "Export"],
         "invest_before": "INVEST before (0-12)", "invest_after": "INVEST after (0-12)",
-        "story": "Story", "review_notes": "Reviewer notes",
+        "story": "Story", "review_notes": "Reviewer notes", "tasks": "Tasks",
         "dl_prd": "Download PRD (Markdown)", "dl_azure": "Download Azure DevOps CSV",
         "dl_jira": "Download Jira CSV",
         "import_help": "How to import: see docs/import-guide.md in the repository.",
@@ -59,7 +59,7 @@ TEXT = {
         "no_key": "Informe uma chave de API na barra lateral ou ligue o modo demo.",
         "tabs": ["PRD", "Histórias", "Gherkin", "Exportar"],
         "invest_before": "INVEST antes (0-12)", "invest_after": "INVEST depois (0-12)",
-        "story": "História", "review_notes": "Notas do revisor",
+        "story": "História", "review_notes": "Notas do revisor", "tasks": "Tasks",
         "dl_prd": "Baixar PRD (Markdown)", "dl_azure": "Baixar CSV do Azure DevOps",
         "dl_jira": "Baixar CSV do Jira",
         "import_help": "Como importar: veja docs/import-guide.pt-BR.md no repositório.",
@@ -102,6 +102,12 @@ def render_results(result: PipelineResult, t: dict, key: str = "", downloads: bo
                 with st.expander(t["review_notes"]):
                     for r in notes:
                         st.markdown(f"**{r.story_id}** ({r.verdict}): {r.comment}")
+            for s in result.stories:
+                if s.tasks:
+                    with st.expander(f"{s.id} — {s.title} · {t['tasks']} ({len(s.tasks)})"):
+                        st.markdown("\n".join(
+                            f"- **{task.title}**" + (f": {task.description}" if task.description else "")
+                            for task in s.tasks))
     with tabs[2]:
         for s in result.stories:
             if s.scenarios:
@@ -145,6 +151,8 @@ def render_azure_push(result: PipelineResult, t: dict) -> None:
             for line in azure_devops.plan(items, ledger):
                 lines.append(f"- **[{t['azdo_status'][line.status]}]** {line.story_title}")
                 lines += [f"    - {title}" for title in line.task_titles]
+                if line.warning:
+                    lines.append(f"    - ⚠ {line.warning}")
             st.markdown("\n".join(lines))
 
         sendable = ss.get("azdo_previewed") == fingerprint
@@ -157,7 +165,11 @@ def render_azure_push(result: PipelineResult, t: dict) -> None:
             except ValueError as err:
                 st.error(str(err))
                 return
-            report = azure_devops.push(client, items, ledger, confirmed=True)
+            try:
+                report = azure_devops.push(client, items, ledger, confirmed=True)
+            except ValueError as err:
+                st.error(str(err))
+                return
             st.success(t["azdo_summary"].format(stories=report.created_stories, tasks=report.created_tasks,
                                                 skipped=report.skipped))
             for url in report.urls:

@@ -43,9 +43,9 @@ Pergunte ao usuário se quer enviar as histórias e tasks ao Azure DevOps. Só h
 1. Peça o nome da **organização** e do **projeto**. Se for a primeira vez, recomende um projeto de sandbox.
 2. O token (PAT com permissão de leitura e escrita em Work Items) fica na variável de ambiente `AZDO_PAT`. Diga ao usuário para defini-la **no próprio terminal** (PowerShell: `$env:AZDO_PAT = "<token>"` na mesma janela em que o comando vai rodar). **Nunca peça, leia nem repita o token no chat.**
 3. Leia o caminho do repositório em `repo-path.txt` (nesta pasta da skill). Rode a **prévia**, que não envia nada: `cd "<repositório>"` e `python -m scripts.azure_push "<json>" --org <organização> --project <projeto>`. Use o Python onde as dependências do repositório estão instaladas (`pip install -r requirements.txt`). Mostre a prévia ao usuário (histórias, tasks, avisos).
-4. Pergunte: "Confirma o envio?". Só com um **sim explícito**, rode o mesmo comando com `--yes`. A prévia e o envio usam um arquivo de controle (`<json>.azdo-ledger.json`, ao lado do JSON): repetir o comando não duplica nada. Para guardá-lo junto do PDF, passe `--ledger "<pasta do PDF>/Historias - <documento>.azdo-ledger.json"`.
+4. Pergunte: "Confirma o envio?". Só com um **sim explícito**, rode o mesmo comando com `--yes`. **Sempre** passe `--ledger "<pasta do PDF>/Historias - <documento>.azdo-ledger.json"` na prévia e no envio: o arquivo de controle precisa ficar ao lado do PDF, e não ao lado do JSON temporário, que é apagado. Ele evita recriar o que já foi enviado quando o comando é repetido.
 5. Informe o resumo e os links dos work items. Se der erro, mostre a mensagem (ela nunca traz o token) e diga o que já foi criado.
-6. Apague o JSON temporário. Deixe o arquivo de controle ao lado do PDF.
+6. Apague o JSON temporário. O arquivo de controle fica ao lado do PDF.
 
 ## Modo converter
 

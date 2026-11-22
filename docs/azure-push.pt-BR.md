@@ -38,11 +38,11 @@ python -m scripts.azure_push historias.json --org <organização> --project <pro
 
 Opções: `--area` e `--iteration` definem os caminhos de área e iteração (padrão: a raiz do projeto); `--ledger CAMINHO` escolhe onde o arquivo de controle fica.
 
-O que acontece: o tipo de história do projeto é detectado (User Story, Product Backlog Item, Requirement ou Issue), depois cada história é criada, e então suas tasks com vínculo de pai. Os campos opcionais (critérios de aceite, story points ou effort, prioridade) só vão se o processo do projeto os tiver.
+O que acontece: o tipo de história do projeto é detectado (User Story, Product Backlog Item, Requirement ou Issue), depois cada história é criada, e então suas tasks com vínculo de pai. Os campos opcionais (critérios de aceite, story points ou effort, prioridade) só vão se o processo do projeto os tiver. Se o processo não tem o campo Acceptance Criteria (por exemplo, Basic), os critérios são acrescentados à descrição da história, sob um título, em vez de serem descartados.
 
 ## O que o arquivo de controle faz
 
-A cada work item criado, o comando grava um arquivo pequeno ao lado da entrada (`<nome>.azdo-ledger.json`). Se você rodar de novo, as histórias terminadas são puladas, e uma história que perdeu tasks por causa de um erro recebe só as que faltam. Nada é duplicado. `--force` ignora o arquivo e cria tudo de novo.
+A cada work item criado, o comando grava um arquivo pequeno ao lado da entrada (`<nome>.azdo-ledger.json`). Se você rodar de novo, as histórias terminadas são puladas, e uma história que perdeu tasks por causa de um erro recebe só as que faltam. O que o arquivo registrou não é criado de novo. Ainda é possível haver duplicatas se uma requisição der timeout depois de o Azure já ter criado o item, ou se você regenerar as histórias com texto diferente (elas contam como histórias novas). Duas histórias idênticas na mesma entrada são rejeitadas. `--force` ignora o arquivo e cria tudo de novo.
 
 ## Pelo app e pela skill
 

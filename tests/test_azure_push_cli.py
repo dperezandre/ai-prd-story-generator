@@ -112,3 +112,19 @@ def test_explicit_ledger_path(tmp_path):
 def test_missing_input_file_exits_2(tmp_path, capsys):
     code = main([str(tmp_path / "nope.json"), "--org", "o", "--project", "p"], environ=ENV)
     assert code == 2 and "nope.json" in capsys.readouterr().err
+
+
+def test_identical_stories_exit_2_with_a_clear_message(tmp_path, capsys):
+    twin = dict(SKILL_JSON["stories"][0])
+    code, _ = run(tmp_path, "--yes", text=json.dumps({"stories": [twin, dict(twin)]}),
+                  transport=httpx.MockTransport(FakeAzure()))
+    assert code == 2 and "identical" in capsys.readouterr().err
+
+
+def test_unwritable_ledger_exits_3_before_creating_anything(tmp_path, capsys):
+    blocker = tmp_path / "blocker"
+    blocker.write_text("x", encoding="utf-8")
+    azure = FakeAzure()
+    code, _ = run(tmp_path, "--yes", "--ledger", str(blocker / "ledger.json"),
+                  transport=httpx.MockTransport(azure))
+    assert code == 3 and azure.created == [] and "ledger" in capsys.readouterr().err.lower()
