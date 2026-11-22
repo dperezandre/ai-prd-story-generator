@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from src.models import PRD, InvestScores, PipelineResult, Scenario, Story
+from src.models import PRD, InvestScores, PipelineResult, Scenario, Story, Task
 
 
 def make_story(**kw):
@@ -75,3 +75,16 @@ def test_story_rule_refs_default_empty_and_roundtrip():
     assert make_story().rule_refs == []
     s = make_story(rule_refs=["RN01", "RN03"])
     assert Story.model_validate_json(s.model_dump_json()).rule_refs == ["RN01", "RN03"]
+
+
+def test_story_tasks_default_empty_and_roundtrip():
+    assert make_story().tasks == []
+    s = make_story(tasks=[Task(title="t", description="d"), Task(title="only title")])
+    again = Story.model_validate_json(s.model_dump_json())
+    assert again.tasks == [Task(title="t", description="d"), Task(title="only title", description="")]
+
+
+def test_pipeline_result_with_tasks_roundtrips():
+    r = PipelineResult(idea="i", language="en", prd=PRD(title="T", problem="P"),
+                       stories=[make_story(tasks=[Task(title="t")])])
+    assert PipelineResult.model_validate_json(r.model_dump_json()) == r
