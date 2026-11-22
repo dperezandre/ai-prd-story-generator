@@ -178,12 +178,33 @@ def render_azure_push(result: PipelineResult, t: dict) -> None:
                 st.error(str(report.error))
 
 
+STYLE = """
+<style>
+.block-container {max-width: 1100px; padding-top: 2.5rem;}
+h1 {font-weight: 800; letter-spacing: -0.02em;
+    background: linear-gradient(90deg, #6D4AFF, #B04AFF);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
+h2, h3 {letter-spacing: -0.01em;}
+div[data-testid="stTextArea"] textarea {border-radius: 12px; font-size: 1.02rem;}
+div.stButton > button, div.stDownloadButton > button {border-radius: 10px; font-weight: 600;}
+div.stButton > button[kind="primary"] {
+    background: linear-gradient(90deg, #6D4AFF, #8E4AFF); border: 0; padding: 0.6rem 1.6rem;
+    box-shadow: 0 4px 14px rgba(109, 74, 255, 0.35);}
+div[data-testid="stExpander"] {border-radius: 12px; border: 1px solid #E4E0F5; background: #FFFFFF;}
+div[data-testid="stTabs"] button[role="tab"] {font-weight: 600;}
+section[data-testid="stSidebar"] {border-right: 1px solid #E4E0F5;}
+</style>
+"""
+
+
 def main() -> None:
     st.set_page_config(page_title="PRD & Story Generator", page_icon="📝", layout="wide")
+    st.markdown(STYLE, unsafe_allow_html=True)
     ss = st.session_state
     ss.setdefault("lang", "pt-BR")
     ss.setdefault("demo", True)
     ss.setdefault("idea", "")
+    ss.setdefault("provider", "claude")
 
     with st.sidebar:
         st.selectbox("Language / Idioma", ["pt-BR", "en"], key="lang",
