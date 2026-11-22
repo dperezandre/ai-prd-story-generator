@@ -4,6 +4,7 @@ import time
 import pandas as pd
 import streamlit as st
 
+from src import azure_devops
 from src.demo import DEMO_CASES, load_demo
 from src.exporters import azure_devops_csv, jira_csv, prd_markdown
 from src.models import PipelineResult
@@ -33,6 +34,14 @@ TEXT = {
         "dl_prd": "Download PRD (Markdown)", "dl_azure": "Download Azure DevOps CSV",
         "dl_jira": "Download Jira CSV",
         "import_help": "How to import: see docs/import-guide.md in the repository.",
+        "azdo_title": "Link with Azure DevOps",
+        "azdo_help": "Sends the stories and their tasks (no epics) to a project. The token stays in this session only and is never stored. Try a sandbox project first.",
+        "azdo_org": "Organization (name or dev.azure.com URL)", "azdo_project": "Project",
+        "azdo_pat": "Personal access token (Work Items: read and write)",
+        "azdo_preview": "Preview", "azdo_send": "Send to Azure DevOps",
+        "azdo_missing": "Fill in the organization, the project and the token.",
+        "azdo_status": {"new": "new", "sent": "already sent", "partial": "partly sent"},
+        "azdo_summary": "Created {stories} stories and {tasks} tasks; {skipped} skipped (already sent).",
     },
     "pt-BR": {
         "title": "Gerador de PRD e Histórias de Usuário com IA",
@@ -54,6 +63,14 @@ TEXT = {
         "dl_prd": "Baixar PRD (Markdown)", "dl_azure": "Baixar CSV do Azure DevOps",
         "dl_jira": "Baixar CSV do Jira",
         "import_help": "Como importar: veja docs/import-guide.pt-BR.md no repositório.",
+        "azdo_title": "Link com Azure DevOps",
+        "azdo_help": "Envia as histórias e suas tasks (sem épicos) para um projeto. O token fica só nesta sessão e nunca é armazenado. Teste primeiro em um projeto de sandbox.",
+        "azdo_org": "Organização (nome ou URL dev.azure.com)", "azdo_project": "Projeto",
+        "azdo_pat": "Token de acesso pessoal (Work Items: leitura e escrita)",
+        "azdo_preview": "Ver prévia", "azdo_send": "Enviar ao Azure DevOps",
+        "azdo_missing": "Preencha a organização, o projeto e o token.",
+        "azdo_status": {"new": "novo", "sent": "já enviado", "partial": "enviado em parte"},
+        "azdo_summary": "Criadas {stories} histórias e {tasks} tasks; {skipped} ignoradas (já enviadas).",
     },
 }
 
@@ -101,6 +118,52 @@ def render_results(result: PipelineResult, t: dict, key: str = "", downloads: bo
                                "text/csv", key=f"dl_azure{key}")
             st.download_button(t["dl_jira"], jira_csv(result), "jira.csv", "text/csv", key=f"dl_jira{key}")
             st.caption(t["import_help"])
+            if not st.session_state.get("demo"):
+                render_azure_push(result, t)
+
+
+def render_azure_push(result: PipelineResult, t: dict) -> None:
+    ss = st.session_state
+    items = azure_devops.items_from_result(result)
+    fingerprint = result.model_dump_json()
+    with st.expander(t["azdo_title"]):
+        st.caption(t["azdo_help"])
+        org = st.text_input(t["azdo_org"], key="azdo_org")
+        project = st.text_input(t["azdo_project"], key="azdo_project")
+        token = st.text_input(t["azdo_pat"], type="password", key="azdo_pat")
+        try:
+            scope = (azure_devops.normalize_organization(org), project.strip())
+        except ValueError:
+            scope = ("", "")
+        ledgers = ss.setdefault("azdo_ledgers", {})
+        ledger = ledgers.setdefault(scope, azure_devops.Ledger.load(None, *scope))
+
+        if st.button(t["azdo_preview"], key="azdo_preview"):
+            ss["azdo_previewed"] = fingerprint
+        if ss.get("azdo_previewed") == fingerprint:
+            lines = []
+            for line in azure_devops.plan(items, ledger):
+                lines.append(f"- **[{t['azdo_status'][line.status]}]** {line.story_title}")
+                lines += [f"    - {title}" for title in line.task_titles]
+            st.markdown("\n".join(lines))
+
+        sendable = ss.get("azdo_previewed") == fingerprint
+        if st.button(t["azdo_send"], key="azdo_send", type="primary", disabled=not sendable):
+            if not (org.strip() and project.strip() and token.strip()):
+                st.error(t["azdo_missing"])
+                return
+            try:
+                client = azure_devops.AzureDevOpsClient(org, project, token)
+            except ValueError as err:
+                st.error(str(err))
+                return
+            report = azure_devops.push(client, items, ledger, confirmed=True)
+            st.success(t["azdo_summary"].format(stories=report.created_stories, tasks=report.created_tasks,
+                                                skipped=report.skipped))
+            for url in report.urls:
+                st.markdown(f"- {url}")
+            if report.error:
+                st.error(str(report.error))
 
 
 def main() -> None:
