@@ -95,6 +95,10 @@ tests/              suíte pytest (sem rede, sem custo)
 
 Rode os testes com `python -m pytest`.
 
+## Enviar para o Azure DevOps
+
+Toda história sai com suas **tasks** (de 2 a 6, sem estimativas). Um botão na aba Exportar do app, a skill `po-spec-review` e um comando (`python -m scripts.azure_push`) criam as histórias e suas tasks em um projeto do Azure DevOps pela API REST: primeiro a prévia, depois o envio só com a sua confirmação, e repetir o envio nunca duplica work items. O token vem da variável de ambiente `AZDO_PAT` ou de um campo de senha e nunca é armazenado. Veja [docs/azure-push.pt-BR.md](docs/azure-push.pt-BR.md). Foi testado só com respostas simuladas; teste primeiro em um projeto de sandbox.
+
 ## Padrão de especificação e skill de revisão
 
 Cada área de negócio escreve a especificação num modelo próprio. O [padrão de especificação](docs/spec-standard.pt-BR.md) define uma estrutura única (AS IS/TO BE, sistemas, regras de negócio numeradas, critérios em Gherkin, retornos esperados, perguntas em aberto) que o pipeline agora gera, e a skill `po-spec-review` confere qualquer especificação contra ele: estrutura, contradições, lacunas, quebra em histórias INVEST e Gherkin. Instale para o Claude Code com `python -m scripts.install_skill` e peça ao Claude para rodar `/po-spec-review` em um arquivo de especificação.

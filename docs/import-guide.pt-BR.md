@@ -1,6 +1,6 @@
 # Como importar os CSVs gerados no Azure DevOps e no Jira
 
-O app exporta dois arquivos: `azure_devops.csv` e `jira.csv`. Os dois trazem uma linha de **Épico** por épico, seguida de suas **histórias de usuário**, com prioridade MoSCoW, pontos e os critérios de aceite em Gherkin.
+O app exporta dois arquivos: `azure_devops.csv` e `jira.csv`. O `azure_devops.csv` tem uma linha de **User Story** por história, seguida de suas linhas de **Task**. O `jira.csv` tem uma linha de **Épico** por épico, seguida de suas **histórias**. Os dois trazem prioridade MoSCoW, pontos e os critérios de aceite em Gherkin. Para criar os work items direto do app, da skill ou de um comando, sem importar arquivo, veja [azure-push.pt-BR.md](azure-push.pt-BR.md).
 
 > **Situação deste guia.** Os passos e os nomes de colunas foram conferidos na documentação oficial da Microsoft Learn e da Atlassian (links no final). Eles **ainda não foram testados em uma organização real do Azure DevOps nem em um site Jira**. Importe sempre um primeiro arquivo de teste em um projeto de sandbox.
 
@@ -10,13 +10,13 @@ O app exporta dois arquivos: `azure_devops.csv` e `jira.csv`. Os dois trazem uma
 
 | Coluna | Conteúdo |
 |---|---|
-| Work Item Type | `Epic` ou `User Story` |
-| Title 1 / Title 2 | O nome do épico vai em `Title 1`; o título da história vai em `Title 2`. Esse recuo cria o vínculo pai/filho. |
-| Description | "Como ... quero ... para ..." em HTML |
+| Work Item Type | `User Story` ou `Task` |
+| Title 1 / Title 2 | O título da história vai em `Title 1`; o título de cada task dela vai em `Title 2`. Esse recuo cria o vínculo pai/filho. Não há linhas de épico: no processo Agile os filhos de um Epic são Features, então ligar histórias direto a épicos pode ser rejeitado. |
+| Description | História: "Como ... quero ... para ..." em HTML. Task: uma descrição curta em HTML |
 | Acceptance Criteria | Cenários Gherkin em HTML |
 | Priority | MoSCoW mapeado para 1-4 (Must=1, Should=2, Could=3, Won't=4) |
 | Story Points | Estimativa |
-| Tags | `MoSCoW-Must`, `MoSCoW-Should`, `MoSCoW-Could`, `MoSCoW-Wont` |
+| Tags | Nas histórias: `MoSCoW-Must`, `MoSCoW-Should`, `MoSCoW-Could` ou `MoSCoW-Wont`, seguido do nome do épico que o gerador usou, separados por `;` |
 
 **`jira.csv`**
 
@@ -48,7 +48,7 @@ O app exporta dois arquivos: `azure_devops.csv` e `jira.csv`. Os dois trazem uma
 
 ### Bom saber
 - Textos que começam com `=`, `+`, `-` ou `@` saem com um apóstrofo no início para que a planilha não os execute como fórmula. O apóstrofo é importado como parte do texto; remova-o à mão se incomodar.
-- A hierarquia vem de `Title 1` (épico) e `Title 2` (história): cada história vira filha do épico que está acima dela.
+- A hierarquia vem de `Title 1` (história) e `Title 2` (task): cada task vira filha da história que está acima dela.
 - Até 1.000 work items por importação.
 - Os itens novos nascem no estado **New**, e Area/Iteration ficam na raiz do projeto. Adicione as colunas `Area Path` e `Iteration Path` se precisar de outros valores.
 - Deixe a coluna `ID` de fora. Informar um ID em item novo gera erro.

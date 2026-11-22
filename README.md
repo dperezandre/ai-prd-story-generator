@@ -95,6 +95,10 @@ tests/              pytest suite (no network, no cost)
 
 Run the tests with `python -m pytest`.
 
+## Push to Azure DevOps
+
+Every story is generated with its **tasks** (2 to 6, no estimates). A button in the app's Export tab, the `po-spec-review` skill and a command (`python -m scripts.azure_push`) can create the stories and their tasks in an Azure DevOps project through its REST API: preview first, then send only after you confirm, and a repeated send never duplicates work items. The token comes from the `AZDO_PAT` environment variable or a password field and is never stored. See [docs/azure-push.md](docs/azure-push.md). It has been tested with simulated responses only; try a sandbox project first.
+
 ## Specification standard and review skill
 
 Business areas write specs in their own templates. [docs/spec-standard.md](docs/spec-standard.md) defines one structure (as-is/to-be, systems, numbered business rules, Gherkin criteria, expected returns, open questions) that the pipeline now generates, and the `po-spec-review` skill checks any spec against it: structure, contradictions, gaps, INVEST story breakdown and Gherkin. Install it for Claude Code with `python -m scripts.install_skill`, then ask Claude to run `/po-spec-review` on a spec file.
