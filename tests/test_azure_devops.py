@@ -346,3 +346,161 @@ def test_error_messages_never_contain_the_pat():
 def test_work_item_url_points_to_the_project_board():
     client, _ = client_for(lambda r: respond())
     assert client.work_item_url(41) == "https://dev.azure.com/contoso/Shop/_workitems/edit/41"
+
+
+# ---- confirmed, idempotent push ----------------------------------------------------------------
+
+from src.azure_devops import PushReport, push  # noqa: E402
+
+
+class FakeAzure:
+    """Routes the client's requests like Azure would; can fail the Nth work item creation."""
+
+    def __init__(self, fail_on_create=None, fail_status=500, types=TYPES):
+        self.next_id = 100
+        self.creates = 0
+        self.fail_on_create = fail_on_create
+        self.fail_status = fail_status
+        self.types = types
+        self.created: list[tuple[str, dict]] = []
+
+    def __call__(self, request):
+        path = request.url.path
+        if request.method == "GET" and path.endswith("/workitemtypes"):
+            return respond(data=self.types)
+        if request.method == "GET" and path.endswith("/fields"):
+            return respond(data=FIELDS)
+        self.creates += 1
+        if self.creates == self.fail_on_create:
+            return respond(self.fail_status, data={"message": "boom"})
+        self.next_id += 1
+        kind = path.rsplit("/", 1)[-1]
+        self.created.append((kind, {op["path"]: op["value"] for op in json.loads(request.content)}))
+        return respond(data={"id": self.next_id})
+
+
+def push_setup(items, azure=None, ledger_path=None):
+    azure = azure or FakeAzure()
+    client, rec = client_for(azure)
+    ledger = Ledger.load(ledger_path, "contoso", "Shop")
+    return client, rec, azure, ledger
+
+
+def two_items():
+    return items_from_result(result([story(1), story(2)]))
+
+
+def test_push_requires_confirmation_and_makes_no_request():
+    client, rec, _, ledger = push_setup(two_items())
+    with pytest.raises(ValueError, match="confirm"):
+        push(client, two_items(), ledger, confirmed=False)
+    assert rec.requests == [] and ledger.get(two_items()[0]) is None
+
+
+def test_push_creates_story_then_its_tasks_in_order():
+    items = two_items()
+    client, rec, azure, ledger = push_setup(items)
+    report = push(client, items, ledger, confirmed=True)
+    assert isinstance(report, PushReport) and report.error is None
+    assert (report.created_stories, report.created_tasks, report.skipped) == (2, 4, 0)
+    kinds = [k for k, _ in azure.created]
+    assert kinds == ["$User Story", "$Task", "$Task", "$User Story", "$Task", "$Task"]
+    titles = [f["/fields/System.Title"] for _, f in azure.created]
+    assert titles == ["Story 1", "Task 1.1", "Task 1.2", "Story 2", "Task 2.1", "Task 2.2"]
+    first_task_body = json.loads(rec.requests[3].content)
+    assert first_task_body[-1]["value"]["url"].endswith("/workItems/101")
+    assert report.urls == ["https://dev.azure.com/contoso/Shop/_workitems/edit/101",
+                           "https://dev.azure.com/contoso/Shop/_workitems/edit/104"]
+
+
+def test_push_records_ledger_after_each_work_item_even_if_a_later_one_fails(tmp_path):
+    items = two_items()
+    path = tmp_path / "ledger.json"
+    client, _, _, ledger = push_setup(items, FakeAzure(fail_on_create=3, fail_status=400), path)
+    report = push(client, items, ledger, confirmed=True)
+    assert report.error is not None and report.error.kind == "validation"
+    saved = Ledger.load(path, "contoso", "Shop")
+    assert saved.get(items[0]) == {"story_id": 101, "task_ids": [102]}
+    assert saved.get(items[1]) is None
+
+
+def test_rerun_skips_finished_stories():
+    items = two_items()
+    client, _, azure, ledger = push_setup(items)
+    push(client, items, ledger, confirmed=True)
+    created_before = len(azure.created)
+    report = push(client, items, ledger, confirmed=True)
+    assert len(azure.created) == created_before
+    assert (report.created_stories, report.created_tasks, report.skipped) == (0, 0, 2)
+
+
+def test_rerun_after_partial_failure_creates_only_missing_tasks_and_no_second_story():
+    items = two_items()
+    azure = FakeAzure(fail_on_create=3, fail_status=400)
+    client, rec, _, ledger = push_setup(items, azure)
+    first = push(client, items, ledger, confirmed=True)
+    assert first.error is not None and (first.created_stories, first.created_tasks) == (1, 1)
+    azure.fail_on_create = None
+    second = push(client, items, ledger, confirmed=True)
+    assert second.error is None and (second.created_stories, second.created_tasks) == (1, 3)
+    titles = [f["/fields/System.Title"] for _, f in azure.created]
+    assert titles.count("Story 1") == 1 and titles.count("Task 1.1") == 1
+    assert titles == ["Story 1", "Task 1.1", "Task 1.2", "Story 2", "Task 2.1", "Task 2.2"]
+    assert rec.requests[-1].method == "POST"
+    assert json.loads(rec.requests[-1].content)[-1]["value"]["url"].endswith("/workItems/104")
+
+
+def test_force_ignores_ledger():
+    items = two_items()
+    client, _, azure, ledger = push_setup(items)
+    push(client, items, ledger, confirmed=True)
+    report = push(client, items, ledger, confirmed=True, force=True)
+    assert (report.created_stories, report.created_tasks, report.skipped) == (2, 4, 0)
+    assert len(azure.created) == 12
+
+
+def test_failure_stops_and_reports_what_was_created():
+    items = two_items()
+    client, _, azure, ledger = push_setup(items, FakeAzure(fail_on_create=4, fail_status=400))
+    report = push(client, items, ledger, confirmed=True)
+    assert report.error.kind == "validation"
+    assert (report.created_stories, report.created_tasks) == (1, 2)
+    assert len(report.urls) == 1
+
+
+def test_auth_failure_before_any_creation_is_reported():
+    items = two_items()
+    client, rec = client_for(lambda r: respond(401, data={"message": "no"}))
+    report = push(client, items, Ledger.load(None, "contoso", "Shop"), confirmed=True)
+    assert report.error.kind == "auth"
+    assert (report.created_stories, report.created_tasks) == (0, 0) and len(rec.requests) == 1
+
+
+def test_story_without_tasks_still_pushes():
+    items = items_from_result(result([story(1, tasks=[])]))
+    client, _, azure, ledger = push_setup(items)
+    report = push(client, items, ledger, confirmed=True)
+    assert (report.created_stories, report.created_tasks, report.error) == (1, 0, None)
+    assert plan(items, ledger)[0].status == "sent"
+
+
+def test_two_stories_same_title_different_text_get_distinct_ledger_entries():
+    items = items_from_result(result([story(1), story(2, title="Story 1", i_want="other")]))
+    client, _, azure, ledger = push_setup(items)
+    report = push(client, items, ledger, confirmed=True)
+    assert report.created_stories == 2
+    assert ledger.get(items[0])["story_id"] != ledger.get(items[1])["story_id"]
+
+
+def test_pbi_project_uses_pbi_type_and_effort():
+    items = items_from_result(result([story(1, tasks=[])]))
+    scrum = {"value": [{"name": "Task"}, {"name": "Product Backlog Item"}]}
+    client, _, azure, ledger = push_setup(items, FakeAzure(types=scrum))
+    push(client, items, ledger, confirmed=True)
+    assert azure.created[0][0] == "$Product Backlog Item"
+
+
+def test_push_with_no_items_makes_no_request():
+    client, rec, _, ledger = push_setup([])
+    report = push(client, [], ledger, confirmed=True)
+    assert rec.requests == [] and report.created_stories == 0 and report.error is None

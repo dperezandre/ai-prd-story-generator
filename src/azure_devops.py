@@ -308,3 +308,49 @@ class AzureDevOpsClient:
             fields.append(("System.Description", task.description))
         fields.extend(self._path_fields())
         return self._create("Task", fields, parent_id=parent_id)
+
+
+@dataclass
+class PushReport:
+    created_stories: int = 0
+    created_tasks: int = 0
+    skipped: int = 0
+    urls: list[str] = field(default_factory=list)
+    error: AzureDevOpsError | None = None
+
+
+def push(client: AzureDevOpsClient, items: list[PushItem], ledger: Ledger,
+         confirmed: bool, force: bool = False) -> PushReport:
+    """Create the stories and their tasks. Stops at the first Azure error and reports what was created.
+
+    The ledger is saved after every created work item, so a repeat run only creates what is missing."""
+    if not confirmed:
+        raise ValueError("The push needs an explicit confirmation.")
+    report = PushReport()
+    if not items:
+        return report
+    try:
+        story_type = client.story_type()
+        available = client.available_fields(story_type)
+        for item in items:
+            entry = None if force else ledger.get(item)
+            if entry is None:
+                story_id = client.create_story(item, story_type, available)
+                task_ids: list[int] = []
+                ledger.record(item, story_id, task_ids)
+                ledger.save()
+                report.created_stories += 1
+                report.urls.append(client.work_item_url(story_id))
+            else:
+                story_id, task_ids = entry["story_id"], list(entry["task_ids"])
+                if len(task_ids) >= len(item.tasks):
+                    report.skipped += 1
+                    continue
+            for task in item.tasks[len(task_ids):]:
+                task_ids.append(client.create_task(task, story_id))
+                ledger.record(item, story_id, task_ids)
+                ledger.save()
+                report.created_tasks += 1
+    except AzureDevOpsError as err:
+        report.error = err
+    return report
