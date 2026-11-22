@@ -111,6 +111,20 @@
             "os dois links são diferentes"
           ]
         }
+      ],
+      "tasks": [
+        {
+          "title": "Gerar um código de indicação único por cliente",
+          "description": "Entrega o cenário em que todo cliente recebe um link único."
+        },
+        {
+          "title": "Exibir o link de indicação com botão de copiar na página da conta",
+          "description": "Entrega o cenário em que o cliente copia o link."
+        },
+        {
+          "title": "Testar a página da conta para um cliente sem código",
+          "description": "Cobre o cenário de erro em que o código não existe."
+        }
       ]
     },
     {
@@ -167,6 +181,20 @@
             "quem indicou não recebe crédito adicional"
           ]
         }
+      ],
+      "tasks": [
+        {
+          "title": "Creditar quem indicou depois do primeiro pedido concluído do amigo",
+          "description": "Entrega o cenário em que a recompensa só sai após a conclusão."
+        },
+        {
+          "title": "Ignorar gatilhos de recompensa de pedidos que não são o primeiro do amigo",
+          "description": "Cobre o cenário alternativo de um pedido repetido."
+        },
+        {
+          "title": "Testar o crédito quando o pedido é cancelado antes de concluir",
+          "description": "Cobre o cenário de erro de um pedido cancelado."
+        }
       ]
     },
     {
@@ -219,6 +247,20 @@
             "o visitante ainda pode navegar e comprar pelos preços normais"
           ]
         }
+      ],
+      "tasks": [
+        {
+          "title": "Ler o código de indicação do link de chegada e guardá-lo na sessão",
+          "description": "Entrega o cenário em que o amigo chega pelo link."
+        },
+        {
+          "title": "Exibir o desconto na página de chegada e de novo no checkout",
+          "description": "Entrega o cenário em que o amigo vê a oferta antes de comprar."
+        },
+        {
+          "title": "Testar um código de indicação inválido ou expirado",
+          "description": "Cobre o cenário de erro de um link ruim."
+        }
       ]
     },
     {
@@ -256,6 +298,16 @@
           "then": [
             "o cliente vê como o programa funciona e o link para copiar"
           ]
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Listar os convites de quem indicou com o status de cada um",
+          "description": "Entrega o cenário em que quem indicou confere cada convite."
+        },
+        {
+          "title": "Exibir um estado vazio quando não há convites",
+          "description": "Cobre o cenário alternativo de quem acabou de começar."
         }
       ]
     },
@@ -297,6 +349,20 @@
           "then": [
             "o desconto e o crédito são concedidos"
           ]
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Rejeitar um código de indicação que pertence ao próprio comprador",
+          "description": "Entrega o cenário em que a autoindicação é bloqueada."
+        },
+        {
+          "title": "Permitir uma única recompensa por amigo indicado",
+          "description": "Entrega o cenário em que recompensas repetidas são bloqueadas."
+        },
+        {
+          "title": "Testar autoindicação com outro e-mail na mesma conta",
+          "description": "Cobre o cenário de erro de uma autoindicação disfarçada."
         }
       ]
     }
@@ -355,7 +421,21 @@
         "points": 3,
         "prd_ref": "requirements: mostrar o desconto do amigo antes do checkout",
         "rule_refs": [],
-        "scenarios": []
+        "scenarios": [],
+        "tasks": [
+          {
+            "title": "Ler o código de indicação do link de chegada e guardá-lo na sessão",
+            "description": "Entrega o cenário em que o amigo chega pelo link."
+          },
+          {
+            "title": "Exibir o desconto na página de chegada e de novo no checkout",
+            "description": "Entrega o cenário em que o amigo vê a oferta antes de comprar."
+          },
+          {
+            "title": "Testar um código de indicação inválido ou expirado",
+            "description": "Cobre o cenário de erro de um link ruim."
+          }
+        ]
       },
       "scores_after": {
         "independent": 2,
@@ -389,7 +469,17 @@
         "points": 5,
         "prd_ref": "requirements: permitir que quem indica veja o status dos convites",
         "rule_refs": [],
-        "scenarios": []
+        "scenarios": [],
+        "tasks": [
+          {
+            "title": "Listar os convites de quem indicou com o status de cada um",
+            "description": "Entrega o cenário em que quem indicou confere cada convite."
+          },
+          {
+            "title": "Exibir um estado vazio quando não há convites",
+            "description": "Cobre o cenário alternativo de quem acabou de começar."
+          }
+        ]
       },
       "scores_after": {
         "independent": 2,

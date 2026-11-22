@@ -107,6 +107,12 @@ Scenario: Each customer has a different link
   Then the two links are different
 ```
 
+**Tasks**
+
+- Generate a unique referral code per customer: Delivers the scenario where every customer gets a unique link.
+- Show the referral link with a copy button on the account page: Delivers the scenario where the customer copies the link.
+- Test the account page for a customer without a code: Covers the error scenario where the code is missing.
+
 ### S2 — Receive credit for a friend's first order
 
 As a returning customer, I want to receive store credit when my friend completes a first order so that I am rewarded for recommending the store
@@ -135,6 +141,12 @@ Scenario: Credit is given only once per friend
   Then the referrer receives no additional credit
 ```
 
+**Tasks**
+
+- Credit the referrer after the friend's first completed order: Delivers the scenario where the reward is granted only after completion.
+- Ignore reward triggers from orders that are not the friend's first: Covers the alternative scenario of a repeated order.
+- Test crediting when the order is cancelled before completion: Covers the error scenario of a cancelled order.
+
 ### S3 — See the friend discount from the referral link
 
 As a referred friend, I want to see my discount when I arrive through a referral link and again at checkout so that I know the offer is real before I buy
@@ -162,6 +174,12 @@ Scenario: Invalid link shows no discount
   And the visitor can still browse and buy at regular prices
 ```
 
+**Tasks**
+
+- Read the referral code from the arrival link and keep it in the session: Delivers the scenario where the friend arrives through the link.
+- Show the discount on the landing page and again at checkout: Delivers the scenario where the friend sees the offer before buying.
+- Test an invalid or expired referral code: Covers the error scenario of a bad link.
+
 ### S4 — Check the status of my invitations
 
 As a returning customer, I want to see whether each invited friend has registered or ordered so that I know when to expect my credit
@@ -181,6 +199,11 @@ Scenario: Empty state explains how to start
   When the customer opens the referral page
   Then the customer sees how the program works and the link to copy
 ```
+
+**Tasks**
+
+- List the invitations of the referrer with their status: Delivers the scenario where the referrer checks each invitation.
+- Show an empty state when there are no invitations: Covers the alternative scenario of a new referrer.
 
 ### S5 — Block self-referral
 
@@ -202,3 +225,9 @@ Scenario: Legitimate referral is unaffected
   When the friend completes a first order
   Then both the discount and the credit are granted
 ```
+
+**Tasks**
+
+- Reject a referral code that belongs to the buyer: Delivers the scenario where self-referral is blocked.
+- Allow only one reward per referred friend: Delivers the scenario where repeated rewards are blocked.
+- Test self-referral with a different email on the same account: Covers the error scenario of a disguised self-referral.

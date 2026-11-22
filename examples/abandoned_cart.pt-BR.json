@@ -105,6 +105,20 @@
             "nenhum lembrete é enviado"
           ]
         }
+      ],
+      "tasks": [
+        {
+          "title": "Detectar o carrinho abandonado por um cliente logado",
+          "description": "Entrega o cenário em que o abandono é identificado."
+        },
+        {
+          "title": "Enviar o e-mail de lembrete com o resumo do carrinho",
+          "description": "Entrega o cenário em que o cliente recebe o lembrete."
+        },
+        {
+          "title": "Testar um cliente com o carrinho vazio",
+          "description": "Cobre o cenário de erro em que nada deve ser enviado."
+        }
       ]
     },
     {
@@ -145,6 +159,20 @@
             "nenhum outro lembrete é enviado"
           ]
         }
+      ],
+      "tasks": [
+        {
+          "title": "Agendar um lembrete de acompanhamento para 24 horas após o primeiro",
+          "description": "Entrega o cenário em que um único acompanhamento é enviado."
+        },
+        {
+          "title": "Bloquear um segundo acompanhamento para o mesmo carrinho",
+          "description": "Cobre o cenário alternativo de um gatilho repetido."
+        },
+        {
+          "title": "Testar o acompanhamento quando o cliente já voltou",
+          "description": "Cobre o cenário de erro de um envio atrasado."
+        }
       ]
     },
     {
@@ -184,6 +212,20 @@
             "o carrinho contém o item disponível",
             "o comprador é informado de qual item deixou de estar disponível"
           ]
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Montar o link do e-mail com o identificador do carrinho",
+          "description": "Entrega o cenário em que o link aponta para o carrinho salvo."
+        },
+        {
+          "title": "Restaurar o conteúdo do carrinho ao abrir o link",
+          "description": "Entrega o cenário em que o cliente chega a um carrinho preenchido."
+        },
+        {
+          "title": "Testar um link cujos itens não estão mais disponíveis",
+          "description": "Cobre o cenário alternativo de itens indisponíveis."
         }
       ]
     },
@@ -226,6 +268,16 @@
             "o acompanhamento agendado não é enviado"
           ]
         }
+      ],
+      "tasks": [
+        {
+          "title": "Incluir um link de descadastro em todo lembrete",
+          "description": "Entrega o cenário em que o cliente pode sair da lista."
+        },
+        {
+          "title": "Parar todos os lembretes assim que o descadastro for recebido",
+          "description": "Entrega o cenário em que a escolha é respeitada na hora."
+        }
       ]
     },
     {
@@ -265,6 +317,16 @@
           "then": [
             "o acompanhamento lista apenas os dois itens restantes"
           ]
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Cancelar os lembretes pendentes quando um pedido é concluído",
+          "description": "Entrega o cenário em que os lembretes param após a compra."
+        },
+        {
+          "title": "Testar uma compra feita enquanto um acompanhamento está na fila",
+          "description": "Cobre o cenário alternativo de uma mensagem na fila."
         }
       ]
     }
@@ -310,7 +372,21 @@
         "rule_refs": [
           "RN01"
         ],
-        "scenarios": []
+        "scenarios": [],
+        "tasks": [
+          {
+            "title": "Agendar um lembrete de acompanhamento para 24 horas após o primeiro",
+            "description": "Entrega o cenário em que um único acompanhamento é enviado."
+          },
+          {
+            "title": "Bloquear um segundo acompanhamento para o mesmo carrinho",
+            "description": "Cobre o cenário alternativo de um gatilho repetido."
+          },
+          {
+            "title": "Testar o acompanhamento quando o cliente já voltou",
+            "description": "Cobre o cenário de erro de um envio atrasado."
+          }
+        ]
       },
       "scores_after": {
         "independent": 2,
@@ -344,7 +420,21 @@
         "points": 5,
         "prd_ref": "requirements: restaurar o conteúdo do carrinho",
         "rule_refs": [],
-        "scenarios": []
+        "scenarios": [],
+        "tasks": [
+          {
+            "title": "Montar o link do e-mail com o identificador do carrinho",
+            "description": "Entrega o cenário em que o link aponta para o carrinho salvo."
+          },
+          {
+            "title": "Restaurar o conteúdo do carrinho ao abrir o link",
+            "description": "Entrega o cenário em que o cliente chega a um carrinho preenchido."
+          },
+          {
+            "title": "Testar um link cujos itens não estão mais disponíveis",
+            "description": "Cobre o cenário alternativo de itens indisponíveis."
+          }
+        ]
       },
       "scores_after": {
         "independent": 2,

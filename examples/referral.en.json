@@ -111,6 +111,20 @@
             "the two links are different"
           ]
         }
+      ],
+      "tasks": [
+        {
+          "title": "Generate a unique referral code per customer",
+          "description": "Delivers the scenario where every customer gets a unique link."
+        },
+        {
+          "title": "Show the referral link with a copy button on the account page",
+          "description": "Delivers the scenario where the customer copies the link."
+        },
+        {
+          "title": "Test the account page for a customer without a code",
+          "description": "Covers the error scenario where the code is missing."
+        }
       ]
     },
     {
@@ -167,6 +181,20 @@
             "the referrer receives no additional credit"
           ]
         }
+      ],
+      "tasks": [
+        {
+          "title": "Credit the referrer after the friend's first completed order",
+          "description": "Delivers the scenario where the reward is granted only after completion."
+        },
+        {
+          "title": "Ignore reward triggers from orders that are not the friend's first",
+          "description": "Covers the alternative scenario of a repeated order."
+        },
+        {
+          "title": "Test crediting when the order is cancelled before completion",
+          "description": "Covers the error scenario of a cancelled order."
+        }
       ]
     },
     {
@@ -219,6 +247,20 @@
             "the visitor can still browse and buy at regular prices"
           ]
         }
+      ],
+      "tasks": [
+        {
+          "title": "Read the referral code from the arrival link and keep it in the session",
+          "description": "Delivers the scenario where the friend arrives through the link."
+        },
+        {
+          "title": "Show the discount on the landing page and again at checkout",
+          "description": "Delivers the scenario where the friend sees the offer before buying."
+        },
+        {
+          "title": "Test an invalid or expired referral code",
+          "description": "Covers the error scenario of a bad link."
+        }
       ]
     },
     {
@@ -256,6 +298,16 @@
           "then": [
             "the customer sees how the program works and the link to copy"
           ]
+        }
+      ],
+      "tasks": [
+        {
+          "title": "List the invitations of the referrer with their status",
+          "description": "Delivers the scenario where the referrer checks each invitation."
+        },
+        {
+          "title": "Show an empty state when there are no invitations",
+          "description": "Covers the alternative scenario of a new referrer."
         }
       ]
     },
@@ -297,6 +349,20 @@
           "then": [
             "both the discount and the credit are granted"
           ]
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Reject a referral code that belongs to the buyer",
+          "description": "Delivers the scenario where self-referral is blocked."
+        },
+        {
+          "title": "Allow only one reward per referred friend",
+          "description": "Delivers the scenario where repeated rewards are blocked."
+        },
+        {
+          "title": "Test self-referral with a different email on the same account",
+          "description": "Covers the error scenario of a disguised self-referral."
         }
       ]
     }
@@ -355,7 +421,21 @@
         "points": 3,
         "prd_ref": "requirements: show the friend's discount before checkout",
         "rule_refs": [],
-        "scenarios": []
+        "scenarios": [],
+        "tasks": [
+          {
+            "title": "Read the referral code from the arrival link and keep it in the session",
+            "description": "Delivers the scenario where the friend arrives through the link."
+          },
+          {
+            "title": "Show the discount on the landing page and again at checkout",
+            "description": "Delivers the scenario where the friend sees the offer before buying."
+          },
+          {
+            "title": "Test an invalid or expired referral code",
+            "description": "Covers the error scenario of a bad link."
+          }
+        ]
       },
       "scores_after": {
         "independent": 2,
@@ -389,7 +469,17 @@
         "points": 5,
         "prd_ref": "requirements: let the referrer see invitation status",
         "rule_refs": [],
-        "scenarios": []
+        "scenarios": [],
+        "tasks": [
+          {
+            "title": "List the invitations of the referrer with their status",
+            "description": "Delivers the scenario where the referrer checks each invitation."
+          },
+          {
+            "title": "Show an empty state when there are no invitations",
+            "description": "Covers the alternative scenario of a new referrer."
+          }
+        ]
       },
       "scores_after": {
         "independent": 2,
