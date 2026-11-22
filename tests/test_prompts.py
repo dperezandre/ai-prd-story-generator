@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 PROMPTS = Path(__file__).resolve().parent.parent / "prompts"
-FILES = ["01_prd.md", "02_stories.md", "03_invest_review.md", "04_gherkin.md"]
+FILES = ["01_prd.md", "02_stories.md", "03_invest_review.md", "04_gherkin.md", "05_tasks.md"]
 HEADINGS = {
     "en": ["# Persona", "# Task", "# Rules", "# Output format", "# Examples"],
     "pt-BR": ["# Persona", "# Tarefa", "# Regras", "# Formato de saída", "# Exemplos"],
@@ -18,6 +18,7 @@ OUTPUT_KEYS = {
                             "valuable", "estimable", "small", "testable", "verdict",
                             "rewrite", "scores_after"],
     "04_gherkin.md": ["scenarios", "name", "given", "when", "then"],
+    "05_tasks.md": ["tasks", "title", "description"],
 }
 
 

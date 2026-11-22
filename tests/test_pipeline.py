@@ -20,6 +20,7 @@ def story(i, **kw):
 SCORES = dict(independent=2, negotiable=2, valuable=2, estimable=2, small=2, testable=2)
 BAD = dict(SCORES, small=0)
 SCEN = [{"name": "n", "given": ["a"], "when": ["b"], "then": ["c"]}]
+TASKS = [{"title": "Build the endpoint", "description": "d"}, {"title": "Write the tests"}]
 
 
 def good_responses():
@@ -32,6 +33,7 @@ def good_responses():
              "rewrite": story(2, points=5, title="smaller"), "scores_after": SCORES},
         ]}),
         json.dumps({"scenarios": {"S1": SCEN, "S2": SCEN}}),
+        json.dumps({"tasks": {"S1": TASKS, "S2": TASKS[:1]}}),
     ]
 
 
@@ -40,11 +42,11 @@ def run(responses, idea="an idea", **kw):
     return run_pipeline(idea, "en", p, **kw), p
 
 
-def test_happy_path_runs_four_steps_in_order():
+def test_happy_path_runs_five_steps_in_order():
     seen = []
     res, p = run(good_responses(), on_step=lambda step, r: seen.append(step))
-    assert seen == ["prd", "stories", "invest", "gherkin"]
-    assert len(p.calls) == 4
+    assert seen == ["prd", "stories", "invest", "gherkin", "tasks"]
+    assert len(p.calls) == 5
     assert res.prd.title == "Referral"
     assert [s.id for s in res.stories] == ["S1", "S2"]
     assert all(s.scenarios for s in res.stories)
@@ -75,7 +77,7 @@ def test_invalid_json_retries_once_with_error_appended():
     responses = ["not json at all"] + good_responses()
     res, p = run(responses)
     assert res.prd is not None
-    assert len(p.calls) == 5
+    assert len(p.calls) == 6
     assert p.calls[1][1].startswith(p.calls[0][1])
     assert "invalid" in p.calls[1][1].lower()
 
@@ -152,3 +154,39 @@ def test_rewrite_cannot_move_story_to_another_epic():
 
 def test_json_extraction_survives_braces_in_surrounding_prose():
     assert parse_json_response('Note {x} first. {"a": 1} done {y}') == {"a": 1}
+
+
+def with_tasks_reply(reply):
+    return good_responses()[:4] + [reply]
+
+
+def test_tasks_attach_to_matching_story():
+    res, _ = run(good_responses())
+    assert [t.title for t in res.stories[0].tasks] == ["Build the endpoint", "Write the tests"]
+    assert res.stories[0].tasks[1].description == ""
+    assert [t.title for t in res.stories[1].tasks] == ["Build the endpoint"]
+
+
+def test_tasks_for_unknown_story_id_are_ignored():
+    res, _ = run(with_tasks_reply(json.dumps({"tasks": {"S1": TASKS, "S99": TASKS}})))
+    assert [s.id for s in res.stories] == ["S1", "S2"]
+    assert res.stories[0].tasks and res.stories[1].tasks == []
+
+
+def test_story_without_tasks_in_reply_gets_empty_list():
+    res, _ = run(with_tasks_reply(json.dumps({"tasks": {}})))
+    assert all(s.tasks == [] for s in res.stories)
+
+
+def test_tasks_step_failure_keeps_earlier_results():
+    with pytest.raises(PipelineError) as err:
+        run(with_tasks_reply(ProviderError("down", "network")))
+    assert err.value.step == "tasks"
+    partial = err.value.partial
+    assert [s.id for s in partial.stories] == ["S1", "S2"] and all(s.scenarios for s in partial.stories)
+
+
+def test_tasks_step_receives_stories_and_scenarios():
+    _, p = run(good_responses())
+    user = p.calls[4][1]
+    assert "S1" in user and "Build" not in user and '"scenarios"' in user
