@@ -108,6 +108,12 @@ Cenário: Cada cliente tem um link diferente
   Então os dois links são diferentes
 ```
 
+**Tarefas**
+
+- Gerar um código de indicação único por cliente: Entrega o cenário em que todo cliente recebe um link único.
+- Exibir o link de indicação com botão de copiar na página da conta: Entrega o cenário em que o cliente copia o link.
+- Testar a página da conta para um cliente sem código: Cobre o cenário de erro em que o código não existe.
+
 ### S2 — Receber crédito pelo primeiro pedido do amigo
 
 Como cliente recorrente, quero receber crédito na loja quando meu amigo concluir um primeiro pedido para seja recompensado por recomendar a loja
@@ -137,6 +143,12 @@ Cenário: O crédito é dado uma única vez por amigo
   Então quem indicou não recebe crédito adicional
 ```
 
+**Tarefas**
+
+- Creditar quem indicou depois do primeiro pedido concluído do amigo: Entrega o cenário em que a recompensa só sai após a conclusão.
+- Ignorar gatilhos de recompensa de pedidos que não são o primeiro do amigo: Cobre o cenário alternativo de um pedido repetido.
+- Testar o crédito quando o pedido é cancelado antes de concluir: Cobre o cenário de erro de um pedido cancelado.
+
 ### S3 — Ver o desconto do amigo pelo link de indicação
 
 Como amigo indicado, quero ver meu desconto ao chegar por um link de indicação e de novo no checkout para saiba que a oferta é real antes de comprar
@@ -165,6 +177,12 @@ Cenário: Link inválido não mostra desconto
   E o visitante ainda pode navegar e comprar pelos preços normais
 ```
 
+**Tarefas**
+
+- Ler o código de indicação do link de chegada e guardá-lo na sessão: Entrega o cenário em que o amigo chega pelo link.
+- Exibir o desconto na página de chegada e de novo no checkout: Entrega o cenário em que o amigo vê a oferta antes de comprar.
+- Testar um código de indicação inválido ou expirado: Cobre o cenário de erro de um link ruim.
+
 ### S4 — Acompanhar o status dos meus convites
 
 Como cliente recorrente, quero ver se cada amigo convidado já se cadastrou ou fez pedido para saiba quando esperar meu crédito
@@ -185,6 +203,11 @@ Cenário: O estado vazio explica como começar
   Quando o cliente abre a página de indicações
   Então o cliente vê como o programa funciona e o link para copiar
 ```
+
+**Tarefas**
+
+- Listar os convites de quem indicou com o status de cada um: Entrega o cenário em que quem indicou confere cada convite.
+- Exibir um estado vazio quando não há convites: Cobre o cenário alternativo de quem acabou de começar.
 
 ### S5 — Bloquear autoindicação
 
@@ -207,3 +230,9 @@ Cenário: Indicação legítima não é afetada
   Quando o amigo conclui um primeiro pedido
   Então o desconto e o crédito são concedidos
 ```
+
+**Tarefas**
+
+- Rejeitar um código de indicação que pertence ao próprio comprador: Entrega o cenário em que a autoindicação é bloqueada.
+- Permitir uma única recompensa por amigo indicado: Entrega o cenário em que recompensas repetidas são bloqueadas.
+- Testar autoindicação com outro e-mail na mesma conta: Cobre o cenário de erro de uma autoindicação disfarçada.

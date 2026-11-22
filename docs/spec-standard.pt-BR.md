@@ -15,7 +15,7 @@ Este é o padrão que o pipeline gera e que a skill [`po-spec-review`](../skills
 | 2.3 | Situação atual (AS IS) | ● | Fatos sobre como funciona hoje |
 | 2.4 | Situação futura (TO BE) | ● | Comportamento futuro em termos observáveis, por ator |
 | 2.5 | Sistemas e módulos | ● | Cada sistema com seu módulo |
-| 3.1 | User Story | ● | Como / Quero / Para, com um único papel e um valor (não uma solução) |
+| 3.1 | User Story e tasks | ● | Como / Quero / Para, com um único papel e um valor (não uma solução); de 2 a 6 tasks concretas, sem estimativas |
 | 3.2 | Regras de negócio | ● | Numeradas (`RN01`...), atômicas, testáveis, sem sobreposição com os requisitos |
 | 3.3 | Especificação detalhada | ● | Para cada campo: tipo, valores permitidos, unidade, obrigatório, o que acontece quando vazio, origem e momento da leitura |
 | 3.4 | Critérios de aceite | ● | Gherkin: cenário nomeado, um comportamento por cenário, ao menos um caminho feliz, um alternativo e um de erro; cada cenário aponta a `RN` que cobre |

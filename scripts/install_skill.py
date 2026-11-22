@@ -18,6 +18,7 @@ def install(skills_dir: Path) -> Path:
     shutil.copyfile(SKILL_DIR / "SKILL.md", dest / "SKILL.md")
     shutil.copyfile(STANDARD, dest / "standard.pt-BR.md")
     shutil.copytree(SKILL_DIR / "scripts", dest / "scripts", dirs_exist_ok=True)
+    (dest / "repo-path.txt").write_text(str(ROOT), encoding="utf-8")
     return dest
 
 

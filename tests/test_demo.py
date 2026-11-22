@@ -40,3 +40,15 @@ def test_example_csvs_match_exporters_and_parse(case, lang):
             text = fh.read()
         assert text == exporter(r)
         assert len(list(csv.reader(io.StringIO(text, newline="")))) > 1
+
+
+@pytest.mark.parametrize("case,lang", COMBOS)
+def test_every_example_story_has_two_to_six_tasks_without_estimates(case, lang):
+    r = load_demo(case, lang)
+    for s in r.stories:
+        assert 2 <= len(s.tasks) <= 6, s.id
+        for t in s.tasks:
+            assert t.title and t.description
+            assert not any(w in (t.title + t.description).lower() for w in ("estimate", "estimativa", "story point", "pontos"))
+    rewritten = [rv.rewrite for rv in r.reviews if rv.rewrite]
+    assert all(rw.tasks for rw in rewritten)

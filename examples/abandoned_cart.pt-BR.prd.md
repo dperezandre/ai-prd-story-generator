@@ -104,6 +104,12 @@ Cenário: Sem consentimento, sem lembrete
   Então nenhum lembrete é enviado
 ```
 
+**Tarefas**
+
+- Detectar o carrinho abandonado por um cliente logado: Entrega o cenário em que o abandono é identificado.
+- Enviar o e-mail de lembrete com o resumo do carrinho: Entrega o cenário em que o cliente recebe o lembrete.
+- Testar um cliente com o carrinho vazio: Cobre o cenário de erro em que nada deve ser enviado.
+
 ### S2 — Enviar um acompanhamento após 24 horas
 
 Como gerente de e-commerce, quero um único lembrete de acompanhamento 24 horas após o primeiro, quando o carrinho continua aberto para mais compradores voltem sem serem contatados em excesso
@@ -124,6 +130,12 @@ Cenário: Não há terceiro lembrete
   Quando mais tempo passa
   Então nenhum outro lembrete é enviado
 ```
+
+**Tarefas**
+
+- Agendar um lembrete de acompanhamento para 24 horas após o primeiro: Entrega o cenário em que um único acompanhamento é enviado.
+- Bloquear um segundo acompanhamento para o mesmo carrinho: Cobre o cenário alternativo de um gatilho repetido.
+- Testar o acompanhamento quando o cliente já voltou: Cobre o cenário de erro de um envio atrasado.
 
 ### S3 — Restaurar meu carrinho pelo link do e-mail
 
@@ -148,6 +160,12 @@ Cenário: Itens indisponíveis são explicados
   E o comprador é informado de qual item deixou de estar disponível
 ```
 
+**Tarefas**
+
+- Montar o link do e-mail com o identificador do carrinho: Entrega o cenário em que o link aponta para o carrinho salvo.
+- Restaurar o conteúdo do carrinho ao abrir o link: Entrega o cenário em que o cliente chega a um carrinho preenchido.
+- Testar um link cujos itens não estão mais disponíveis: Cobre o cenário alternativo de itens indisponíveis.
+
 ### S4 — Descadastrar-me dos lembretes
 
 Como comprador indeciso, quero parar de receber lembretes de carrinho com um clique em qualquer lembrete para minha escolha seja respeitada imediatamente
@@ -170,6 +188,11 @@ Cenário: O acompanhamento pendente é cancelado
   Então o acompanhamento agendado não é enviado
 ```
 
+**Tarefas**
+
+- Incluir um link de descadastro em todo lembrete: Entrega o cenário em que o cliente pode sair da lista.
+- Parar todos os lembretes assim que o descadastro for recebido: Entrega o cenário em que a escolha é respeitada na hora.
+
 ### S5 — Parar os lembretes após a compra
 
 Como comprador indeciso, quero que os lembretes parem assim que eu concluir meu pedido para não seja incomodado por algo que já comprei
@@ -190,3 +213,8 @@ Cenário: Compra parcial mantém o restante
   Quando chega a hora do acompanhamento
   Então o acompanhamento lista apenas os dois itens restantes
 ```
+
+**Tarefas**
+
+- Cancelar os lembretes pendentes quando um pedido é concluído: Entrega o cenário em que os lembretes param após a compra.
+- Testar uma compra feita enquanto um acompanhamento está na fila: Cobre o cenário alternativo de uma mensagem na fila.

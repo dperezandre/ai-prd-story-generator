@@ -105,6 +105,20 @@
             "no reminder is sent"
           ]
         }
+      ],
+      "tasks": [
+        {
+          "title": "Detect a cart abandoned by a signed-in shopper",
+          "description": "Delivers the scenario where abandonment is identified."
+        },
+        {
+          "title": "Send the reminder email with the cart summary",
+          "description": "Delivers the scenario where the shopper receives the reminder."
+        },
+        {
+          "title": "Test a shopper with an empty cart",
+          "description": "Covers the error scenario where nothing should be sent."
+        }
       ]
     },
     {
@@ -145,6 +159,20 @@
             "no further reminder is sent"
           ]
         }
+      ],
+      "tasks": [
+        {
+          "title": "Schedule one follow-up for 24 hours after the first reminder",
+          "description": "Delivers the scenario where a single follow-up is sent."
+        },
+        {
+          "title": "Block a second follow-up for the same cart",
+          "description": "Covers the alternative scenario of a repeated trigger."
+        },
+        {
+          "title": "Test the follow-up when the shopper already returned",
+          "description": "Covers the error scenario of a late send."
+        }
       ]
     },
     {
@@ -184,6 +212,20 @@
             "the cart contains the available item",
             "the shopper is told which item is no longer available"
           ]
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Build the email link that carries the cart identifier",
+          "description": "Delivers the scenario where the link points to the saved cart."
+        },
+        {
+          "title": "Restore the cart contents when the link is opened",
+          "description": "Delivers the scenario where the shopper lands on a filled cart."
+        },
+        {
+          "title": "Test a link whose items are no longer available",
+          "description": "Covers the alternative scenario of unavailable items."
         }
       ]
     },
@@ -226,6 +268,16 @@
             "the scheduled follow-up is not sent"
           ]
         }
+      ],
+      "tasks": [
+        {
+          "title": "Add an unsubscribe link to every reminder",
+          "description": "Delivers the scenario where the shopper can opt out."
+        },
+        {
+          "title": "Stop all reminders as soon as the unsubscribe is received",
+          "description": "Delivers the scenario where the choice is honoured immediately."
+        }
       ]
     },
     {
@@ -265,6 +317,16 @@
           "then": [
             "the follow-up lists only the two remaining items"
           ]
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Cancel pending reminders when an order is completed",
+          "description": "Delivers the scenario where reminders stop after purchase."
+        },
+        {
+          "title": "Test a purchase made while a follow-up is queued",
+          "description": "Covers the alternative scenario of a queued message."
         }
       ]
     }
@@ -310,7 +372,21 @@
         "rule_refs": [
           "RN01"
         ],
-        "scenarios": []
+        "scenarios": [],
+        "tasks": [
+          {
+            "title": "Schedule one follow-up for 24 hours after the first reminder",
+            "description": "Delivers the scenario where a single follow-up is sent."
+          },
+          {
+            "title": "Block a second follow-up for the same cart",
+            "description": "Covers the alternative scenario of a repeated trigger."
+          },
+          {
+            "title": "Test the follow-up when the shopper already returned",
+            "description": "Covers the error scenario of a late send."
+          }
+        ]
       },
       "scores_after": {
         "independent": 2,
@@ -344,7 +420,21 @@
         "points": 5,
         "prd_ref": "requirements: restore the cart contents",
         "rule_refs": [],
-        "scenarios": []
+        "scenarios": [],
+        "tasks": [
+          {
+            "title": "Build the email link that carries the cart identifier",
+            "description": "Delivers the scenario where the link points to the saved cart."
+          },
+          {
+            "title": "Restore the cart contents when the link is opened",
+            "description": "Delivers the scenario where the shopper lands on a filled cart."
+          },
+          {
+            "title": "Test a link whose items are no longer available",
+            "description": "Covers the alternative scenario of unavailable items."
+          }
+        ]
       },
       "scores_after": {
         "independent": 2,

@@ -1,16 +1,17 @@
-"""Four-step generation pipeline: PRD -> stories -> INVEST review -> Gherkin."""
+"""Five-step generation pipeline: PRD -> stories -> INVEST review -> Gherkin -> tasks."""
 import json
 from pathlib import Path
 from typing import Any, Callable
 
 from pydantic import BaseModel, ValidationError
 
-from src.models import PRD, Language, PipelineResult, Review, Scenario, Story
+from src.models import PRD, Language, PipelineResult, Review, Scenario, Story, Task
 from src.providers import LLMProvider, ProviderError
 
 MAX_IDEA_CHARS = 4000
-STEPS = ("prd", "stories", "invest", "gherkin")
-_PROMPT_FILES = dict(zip(STEPS, ("01_prd.md", "02_stories.md", "03_invest_review.md", "04_gherkin.md")))
+STEPS = ("prd", "stories", "invest", "gherkin", "tasks")
+_PROMPT_FILES = dict(zip(STEPS, ("01_prd.md", "02_stories.md", "03_invest_review.md", "04_gherkin.md",
+                                           "05_tasks.md")))
 DEFAULT_PROMPTS_DIR = Path(__file__).resolve().parent.parent / "prompts"
 
 
@@ -45,6 +46,10 @@ class _ReviewList(BaseModel):
 
 class _ScenarioMap(BaseModel):
     scenarios: dict[str, list[Scenario]]
+
+
+class _TaskMap(BaseModel):
+    tasks: dict[str, list[Task]]
 
 
 def _call_json(provider: LLMProvider, system: str, user: str, model: type[BaseModel]) -> BaseModel:
@@ -118,8 +123,14 @@ def run_pipeline(idea: str, language: Language, provider: LLMProvider,
         for story in result.stories:
             story.scenarios = mapping.get(story.id, [])
 
+    def do_tasks() -> None:
+        mapping = _call_json(provider, system_for("tasks"), _context(result), _TaskMap).tasks
+        for story in result.stories:
+            story.tasks = mapping.get(story.id, [])
+
     guarded("prd", do_prd)
     guarded("stories", do_stories)
     guarded("invest", do_invest)
     guarded("gherkin", do_gherkin)
+    guarded("tasks", do_tasks)
     return result

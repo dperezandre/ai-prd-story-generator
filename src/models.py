@@ -80,6 +80,11 @@ class Scenario(BaseModel):
         return "# language: pt\n" + text if language == "pt-BR" else text
 
 
+class Task(BaseModel):
+    title: str
+    description: str = ""
+
+
 class Story(BaseModel):
     id: str
     epic: str
@@ -92,6 +97,7 @@ class Story(BaseModel):
     prd_ref: str
     rule_refs: list[str] = []
     scenarios: list[Scenario] = []
+    tasks: list[Task] = []
 
     def to_text(self, language: Language) -> str:
         if language == "pt-BR":

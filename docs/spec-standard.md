@@ -11,7 +11,7 @@ The canonical version, with the full review checklist, is [docs/spec-standard.pt
 | 2.1-2.2 | Objective, justification | yes | What the change enables and why now |
 | 2.3 / 2.4 | As-is / To-be | yes | Facts about today; observable future behavior per actor |
 | 2.5 | Systems and modules | yes | Each system with its module |
-| 3.1 | User story | yes | One role, one value, no implementation |
+| 3.1 | User story and tasks | yes | One role, one value, no implementation; 2 to 6 concrete tasks, no estimates |
 | 3.2 | Business rules | yes | Numbered (`RN01`...), atomic, testable |
 | 3.3 | Detailed specification | yes | Per field: type, allowed values, unit, required, empty behavior, source and read time |
 | 3.4 | Acceptance criteria | yes | Gherkin: named scenarios, one behavior each, happy, alternative and error paths, linked to an `RN` |

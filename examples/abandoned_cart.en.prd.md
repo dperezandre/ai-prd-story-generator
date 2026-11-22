@@ -103,6 +103,12 @@ Scenario: No reminder without consent
   Then no reminder is sent
 ```
 
+**Tasks**
+
+- Detect a cart abandoned by a signed-in shopper: Delivers the scenario where abandonment is identified.
+- Send the reminder email with the cart summary: Delivers the scenario where the shopper receives the reminder.
+- Test a shopper with an empty cart: Covers the error scenario where nothing should be sent.
+
 ### S2 — Send one follow-up after 24 hours
 
 As a e-commerce manager, I want a single follow-up reminder 24 hours after the first one when the cart is still open so that more shoppers come back without being over-contacted
@@ -122,6 +128,12 @@ Scenario: No third reminder
   When more time passes
   Then no further reminder is sent
 ```
+
+**Tasks**
+
+- Schedule one follow-up for 24 hours after the first reminder: Delivers the scenario where a single follow-up is sent.
+- Block a second follow-up for the same cart: Covers the alternative scenario of a repeated trigger.
+- Test the follow-up when the shopper already returned: Covers the error scenario of a late send.
 
 ### S3 — Restore my cart from the email link
 
@@ -145,6 +157,12 @@ Scenario: Unavailable items are explained
   And the shopper is told which item is no longer available
 ```
 
+**Tasks**
+
+- Build the email link that carries the cart identifier: Delivers the scenario where the link points to the saved cart.
+- Restore the cart contents when the link is opened: Delivers the scenario where the shopper lands on a filled cart.
+- Test a link whose items are no longer available: Covers the alternative scenario of unavailable items.
+
 ### S4 — Unsubscribe from reminders
 
 As a hesitant shopper, I want to stop receiving cart reminders with one click from any reminder so that my choice is respected immediately
@@ -166,6 +184,11 @@ Scenario: Pending follow-up is cancelled
   Then the scheduled follow-up is not sent
 ```
 
+**Tasks**
+
+- Add an unsubscribe link to every reminder: Delivers the scenario where the shopper can opt out.
+- Stop all reminders as soon as the unsubscribe is received: Delivers the scenario where the choice is honoured immediately.
+
 ### S5 — Stop reminders after purchase
 
 As a hesitant shopper, I want reminders to stop as soon as I complete my order so that I am not nagged about something I already bought
@@ -185,3 +208,8 @@ Scenario: Partial purchase keeps the rest
   When the follow-up time arrives
   Then the follow-up lists only the two remaining items
 ```
+
+**Tasks**
+
+- Cancel pending reminders when an order is completed: Delivers the scenario where reminders stop after purchase.
+- Test a purchase made while a follow-up is queued: Covers the alternative scenario of a queued message.

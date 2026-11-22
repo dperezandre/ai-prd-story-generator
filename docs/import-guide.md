@@ -1,6 +1,6 @@
 # Importing the generated CSVs into Azure DevOps and Jira
 
-The app exports two files: `azure_devops.csv` and `jira.csv`. Both contain one **Epic** row per epic followed by its **user stories**, with MoSCoW priority, story points and the Gherkin acceptance criteria.
+The app exports two files: `azure_devops.csv` and `jira.csv`. `azure_devops.csv` has one **User Story** row per story followed by its **Task** rows. `jira.csv` has one **Epic** row per epic followed by its **stories**. Both carry MoSCoW priority, story points and the Gherkin acceptance criteria. To create the work items straight from the app, the skill or a command instead of importing a file, see [azure-push.md](azure-push.md).
 
 > **Status of this guide.** The steps and column names were checked against the official Microsoft Learn and Atlassian documentation (links at the end). They were **not yet tested against a live Azure DevOps organization or Jira site**. Always import a first test file into a sandbox project.
 
@@ -10,13 +10,13 @@ The app exports two files: `azure_devops.csv` and `jira.csv`. Both contain one *
 
 | Column | Content |
 |---|---|
-| Work Item Type | `Epic` or `User Story` |
-| Title 1 / Title 2 | Epic name goes in `Title 1`; story title goes in `Title 2`. This indentation creates the parent/child link. |
-| Description | "As a ... I want ... so that ..." as HTML |
+| Work Item Type | `User Story` or `Task` |
+| Title 1 / Title 2 | The story title goes in `Title 1`; each of its task titles goes in `Title 2`. This indentation creates the parent/child link. There are no epic rows: in the Agile process an Epic's children are Features, so linking stories straight to epics can be rejected. |
+| Description | Story: "As a ... I want ... so that ..." as HTML. Task: a short description as HTML |
 | Acceptance Criteria | Gherkin scenarios as HTML |
 | Priority | MoSCoW mapped to 1-4 (Must=1, Should=2, Could=3, Won't=4) |
 | Story Points | Estimate |
-| Tags | `MoSCoW-Must`, `MoSCoW-Should`, `MoSCoW-Could`, `MoSCoW-Wont` |
+| Tags | On stories: `MoSCoW-Must`, `MoSCoW-Should`, `MoSCoW-Could` or `MoSCoW-Wont`, then the epic name the generator used, separated by `;` |
 
 **`jira.csv`**
 
@@ -48,7 +48,7 @@ The app exports two files: `azure_devops.csv` and `jira.csv`. Both contain one *
 
 ### Good to know
 - Text that starts with `=`, `+`, `-` or `@` is exported with a leading apostrophe so spreadsheets do not run it as a formula. The apostrophe is imported as part of the text; remove it by hand if it bothers you.
-- Hierarchy comes from `Title 1` (epic) and `Title 2` (story): each story is linked as a child of the epic above it.
+- Hierarchy comes from `Title 1` (story) and `Title 2` (task): each task is linked as a child of the story above it.
 - Up to 1,000 work items per import.
 - New items are created in state **New**, and Area/Iteration default to the project root. Add `Area Path` and `Iteration Path` columns if you need others.
 - Leave the `ID` column out. Importing an ID on a new item fails.

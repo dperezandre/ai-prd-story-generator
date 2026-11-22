@@ -15,6 +15,7 @@ _MOSCOW_SLUG: dict[Priority, str] = {"Must": "must", "Should": "should", "Could"
 
 _STORIES_HEADING = {"en": "User stories", "pt-BR": "Histórias de usuário"}
 _CRITERIA_HEADING = {"en": "Acceptance criteria", "pt-BR": "Critérios de aceite"}
+_TASKS_HEADING = {"en": "Tasks", "pt-BR": "Tarefas"}
 
 
 def _cell(value: str) -> str:
@@ -47,19 +48,24 @@ def _html_paragraph(text: str) -> str:
 
 
 def azure_devops_csv(result: PipelineResult) -> str:
+    """Stories at Title 1 and their tasks at Title 2; no epics (an Agile epic holds Features, not stories)."""
     rows: list[dict[str, str]] = []
-    for epic, stories in _epics(result).items():
-        rows.append({"Work Item Type": "Epic", "Title 1": epic})
-        for s in stories:
+    for s in result.stories:
+        rows.append({
+            "Work Item Type": "User Story",
+            "Title 1": s.title,
+            "Description": _html_paragraph(s.to_text(result.language)),
+            "Acceptance Criteria": "".join(
+                _html_paragraph(b) for b in _scenario_blocks(s, result.language)),
+            "Priority": _AZURE_PRIORITY[s.priority],
+            "Story Points": str(s.points),
+            "Tags": f"MoSCoW-{_MOSCOW_SLUG[s.priority].capitalize()}; {s.epic}",
+        })
+        for task in s.tasks:
             rows.append({
-                "Work Item Type": "User Story",
-                "Title 2": s.title,
-                "Description": _html_paragraph(s.to_text(result.language)),
-                "Acceptance Criteria": "".join(
-                    _html_paragraph(b) for b in _scenario_blocks(s, result.language)),
-                "Priority": _AZURE_PRIORITY[s.priority],
-                "Story Points": str(s.points),
-                "Tags": "MoSCoW-" + _MOSCOW_SLUG[s.priority].capitalize(),
+                "Work Item Type": "Task",
+                "Title 2": task.title,
+                "Description": _html_paragraph(task.description) if task.description else "",
             })
     return _write(AZURE_COLUMNS, rows)
 
@@ -99,5 +105,9 @@ def prd_markdown(result: PipelineResult) -> str:
                 header = "# language: pt\n" if result.language == "pt-BR" else ""
                 lines += ["", f"**{_CRITERIA_HEADING[result.language]}**", "",
                           "```gherkin\n" + header + "\n\n".join(blocks) + "\n```"]
+            if s.tasks:
+                lines += ["", f"**{_TASKS_HEADING[result.language]}**", ""]
+                lines += [f"- {t.title}: {t.description}" if t.description else f"- {t.title}"
+                          for t in s.tasks]
             parts.append("\n".join(lines))
     return "\n\n".join(parts) + "\n"

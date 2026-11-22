@@ -4,6 +4,7 @@ import time
 import pandas as pd
 import streamlit as st
 
+from src import azure_devops
 from src.demo import DEMO_CASES, load_demo
 from src.exporters import azure_devops_csv, jira_csv, prd_markdown
 from src.models import PipelineResult
@@ -22,16 +23,25 @@ TEXT = {
         "idea": "Describe the feature idea", "examples": "Try an example:", "generate": "Generate",
         "case": {"referral": "Referral program", "abandoned_cart": "Abandoned cart"},
         "steps": {"prd": "Writing the PRD", "stories": "Breaking it into user stories",
-                  "invest": "Reviewing stories with INVEST", "gherkin": "Writing Gherkin acceptance criteria"},
+                  "invest": "Reviewing stories with INVEST", "gherkin": "Writing Gherkin acceptance criteria",
+                  "tasks": "Writing the tasks"},
         "done": "Done", "failed": "Stopped at: {step}. What was already generated is shown below.",
         "demo_note": "Demo mode replays a pre-written example. Turn it off in the sidebar to use your own idea.",
         "no_key": "Enter an API key in the sidebar, or turn on demo mode.",
         "tabs": ["PRD", "Stories", "Gherkin", "Export"],
         "invest_before": "INVEST before (0-12)", "invest_after": "INVEST after (0-12)",
-        "story": "Story", "review_notes": "Reviewer notes",
+        "story": "Story", "review_notes": "Reviewer notes", "tasks": "Tasks",
         "dl_prd": "Download PRD (Markdown)", "dl_azure": "Download Azure DevOps CSV",
         "dl_jira": "Download Jira CSV",
         "import_help": "How to import: see docs/import-guide.md in the repository.",
+        "azdo_title": "Link with Azure DevOps",
+        "azdo_help": "Sends the stories and their tasks (no epics) to a project. The token stays in this session only and is never stored. Try a sandbox project first.",
+        "azdo_org": "Organization (name or dev.azure.com URL)", "azdo_project": "Project",
+        "azdo_pat": "Personal access token (Work Items: read and write)",
+        "azdo_preview": "Preview", "azdo_send": "Send to Azure DevOps",
+        "azdo_missing": "Fill in the organization, the project and the token.",
+        "azdo_status": {"new": "new", "sent": "already sent", "partial": "partly sent"},
+        "azdo_summary": "Created {stories} stories and {tasks} tasks; {skipped} skipped (already sent).",
     },
     "pt-BR": {
         "title": "Gerador de PRD e Histórias de Usuário com IA",
@@ -42,16 +52,25 @@ TEXT = {
         "idea": "Descreva a ideia da funcionalidade", "examples": "Experimente um exemplo:", "generate": "Gerar",
         "case": {"referral": "Programa de indicação", "abandoned_cart": "Carrinho abandonado"},
         "steps": {"prd": "Escrevendo o PRD", "stories": "Quebrando em histórias de usuário",
-                  "invest": "Revisando as histórias com INVEST", "gherkin": "Escrevendo critérios de aceite em Gherkin"},
+                  "invest": "Revisando as histórias com INVEST", "gherkin": "Escrevendo critérios de aceite em Gherkin",
+                  "tasks": "Escrevendo as tasks"},
         "done": "Pronto", "failed": "Parou em: {step}. O que já foi gerado aparece abaixo.",
         "demo_note": "O modo demo reproduz um exemplo pré-escrito. Desligue-o na barra lateral para usar sua própria ideia.",
         "no_key": "Informe uma chave de API na barra lateral ou ligue o modo demo.",
         "tabs": ["PRD", "Histórias", "Gherkin", "Exportar"],
         "invest_before": "INVEST antes (0-12)", "invest_after": "INVEST depois (0-12)",
-        "story": "História", "review_notes": "Notas do revisor",
+        "story": "História", "review_notes": "Notas do revisor", "tasks": "Tasks",
         "dl_prd": "Baixar PRD (Markdown)", "dl_azure": "Baixar CSV do Azure DevOps",
         "dl_jira": "Baixar CSV do Jira",
         "import_help": "Como importar: veja docs/import-guide.pt-BR.md no repositório.",
+        "azdo_title": "Link com Azure DevOps",
+        "azdo_help": "Envia as histórias e suas tasks (sem épicos) para um projeto. O token fica só nesta sessão e nunca é armazenado. Teste primeiro em um projeto de sandbox.",
+        "azdo_org": "Organização (nome ou URL dev.azure.com)", "azdo_project": "Projeto",
+        "azdo_pat": "Token de acesso pessoal (Work Items: leitura e escrita)",
+        "azdo_preview": "Ver prévia", "azdo_send": "Enviar ao Azure DevOps",
+        "azdo_missing": "Preencha a organização, o projeto e o token.",
+        "azdo_status": {"new": "novo", "sent": "já enviado", "partial": "enviado em parte"},
+        "azdo_summary": "Criadas {stories} histórias e {tasks} tasks; {skipped} ignoradas (já enviadas).",
     },
 }
 
@@ -83,6 +102,12 @@ def render_results(result: PipelineResult, t: dict, key: str = "", downloads: bo
                 with st.expander(t["review_notes"]):
                     for r in notes:
                         st.markdown(f"**{r.story_id}** ({r.verdict}): {r.comment}")
+            for s in result.stories:
+                if s.tasks:
+                    with st.expander(f"{s.id} — {s.title} · {t['tasks']} ({len(s.tasks)})"):
+                        st.markdown("\n".join(
+                            f"- **{task.title}**" + (f": {task.description}" if task.description else "")
+                            for task in s.tasks))
     with tabs[2]:
         for s in result.stories:
             if s.scenarios:
@@ -99,6 +124,58 @@ def render_results(result: PipelineResult, t: dict, key: str = "", downloads: bo
                                "text/csv", key=f"dl_azure{key}")
             st.download_button(t["dl_jira"], jira_csv(result), "jira.csv", "text/csv", key=f"dl_jira{key}")
             st.caption(t["import_help"])
+            if not st.session_state.get("demo"):
+                render_azure_push(result, t)
+
+
+def render_azure_push(result: PipelineResult, t: dict) -> None:
+    ss = st.session_state
+    items = azure_devops.items_from_result(result)
+    fingerprint = result.model_dump_json()
+    with st.expander(t["azdo_title"]):
+        st.caption(t["azdo_help"])
+        org = st.text_input(t["azdo_org"], key="azdo_org")
+        project = st.text_input(t["azdo_project"], key="azdo_project")
+        token = st.text_input(t["azdo_pat"], type="password", key="azdo_pat")
+        try:
+            scope = (azure_devops.normalize_organization(org), project.strip())
+        except ValueError:
+            scope = ("", "")
+        ledgers = ss.setdefault("azdo_ledgers", {})
+        ledger = ledgers.setdefault(scope, azure_devops.Ledger.load(None, *scope))
+
+        if st.button(t["azdo_preview"], key="azdo_preview"):
+            ss["azdo_previewed"] = fingerprint
+        if ss.get("azdo_previewed") == fingerprint:
+            lines = []
+            for line in azure_devops.plan(items, ledger):
+                lines.append(f"- **[{t['azdo_status'][line.status]}]** {line.story_title}")
+                lines += [f"    - {title}" for title in line.task_titles]
+                if line.warning:
+                    lines.append(f"    - ⚠ {line.warning}")
+            st.markdown("\n".join(lines))
+
+        sendable = ss.get("azdo_previewed") == fingerprint
+        if st.button(t["azdo_send"], key="azdo_send", type="primary", disabled=not sendable):
+            if not (org.strip() and project.strip() and token.strip()):
+                st.error(t["azdo_missing"])
+                return
+            try:
+                client = azure_devops.AzureDevOpsClient(org, project, token)
+            except ValueError as err:
+                st.error(str(err))
+                return
+            try:
+                report = azure_devops.push(client, items, ledger, confirmed=True)
+            except ValueError as err:
+                st.error(str(err))
+                return
+            st.success(t["azdo_summary"].format(stories=report.created_stories, tasks=report.created_tasks,
+                                                skipped=report.skipped))
+            for url in report.urls:
+                st.markdown(f"- {url}")
+            if report.error:
+                st.error(str(report.error))
 
 
 def main() -> None:
