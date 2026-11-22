@@ -103,6 +103,10 @@ Every story is generated with its **tasks** (2 to 6, no estimates). A button in 
 
 Business areas write specs in their own templates. [docs/spec-standard.md](docs/spec-standard.md) defines one structure (as-is/to-be, systems, numbered business rules, Gherkin criteria, expected returns, open questions) that the pipeline now generates, and the `po-spec-review` skill checks any spec against it: structure, contradictions, gaps, INVEST story breakdown and Gherkin. Install it for Claude Code with `python -m scripts.install_skill`, then ask Claude to run `/po-spec-review` on a spec file.
 
+## Local review through Claude Code
+
+With a Claude subscription and no API key, `python -m streamlit run spec_review_page.py` opens a local page that runs the `po-spec-review` skill through your Claude Code login (Portuguese UI). See [docs/spec-review-page.pt-BR.md](docs/spec-review-page.pt-BR.md).
+
 ## Limitations
 
 - The bundled examples were **written and curated by hand** to show the intended output; they are not a transcript of a model run. Use `python -m scripts.generate_examples` to regenerate them with a real provider.
