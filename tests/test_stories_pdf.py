@@ -21,11 +21,16 @@ DATA = {
                 "Cenário: Telefone vazio mantém o cadastro atual\n  Dado que o campo Telefone está vazio\n  Quando salvo o cadastro\n  Então o cadastro é salvo sem telefone",
                 "[A DEFINIR] formato válido do telefone",
             ],
+            "tasks": [
+                {"title": "Criar o campo telefone", "description": "Entrega o cenário de telefone vazio"},
+                {"title": "Testar o cadastro sem telefone", "description": "Cobre o caminho alternativo"},
+            ],
         },
         {
             "title": "Segunda história",
             "description": "Como modelador, quero x, para y.",
             "acceptance_criteria": ["Cenário: a\n  Dado b"],
+            "tasks": [{"title": "Fazer x", "description": ""}],
         },
     ],
 }
@@ -52,3 +57,25 @@ def test_story_missing_a_field_is_rejected(tmp_path):
     bad = {"document": "x", "stories": [{"title": "t", "description": "d"}]}
     with pytest.raises(ValueError, match="acceptance_criteria"):
         write_pdf(bad, tmp_path / "x.pdf")
+
+
+def test_pdf_has_tasks_block_for_each_story(tmp_path):
+    out = tmp_path / "stories.pdf"
+    write_pdf(DATA, out)
+    text = read_pdf(out)
+    assert text.count("Tasks") == 2
+    for expected in ("Criar o campo telefone", "Entrega o cenário de telefone vazio",
+                     "Testar o cadastro sem telefone", "Fazer x"):
+        assert expected in text, expected
+    assert text.index("Critérios de aceite") < text.index("Tasks") < text.index("Segunda história")
+
+
+def test_story_without_tasks_is_rejected(tmp_path):
+    for tasks in (None, []):
+        story = dict(DATA["stories"][0])
+        if tasks is None:
+            story.pop("tasks")
+        else:
+            story["tasks"] = tasks
+        with pytest.raises(ValueError, match="tasks"):
+            write_pdf({"document": "x", "stories": [story]}, tmp_path / "x.pdf")

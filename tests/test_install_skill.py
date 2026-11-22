@@ -15,3 +15,11 @@ def test_install_twice_overwrites(tmp_path):
     (tmp_path / "po-spec-review" / "SKILL.md").write_text("old", encoding="utf-8")
     install(tmp_path)
     assert (tmp_path / "po-spec-review" / "SKILL.md").read_text(encoding="utf-8").startswith("---")
+
+
+def test_install_writes_repo_path(tmp_path):
+    from pathlib import Path
+
+    dest = install(tmp_path)
+    repo = Path(__file__).resolve().parent.parent
+    assert (dest / "repo-path.txt").read_text(encoding="utf-8").strip() == str(repo)

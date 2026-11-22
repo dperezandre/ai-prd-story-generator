@@ -6,7 +6,8 @@ Needs PyMuPDF (pip install pymupdf).
 stories.json:
 {"document": "name of the spec", "stories": [
   {"title": "...", "description": "Como ..., quero ..., para ...",
-   "acceptance_criteria": ["Cenário: ...\n  Dado ...\n  Quando ...\n  Então ...", "..."]}]}
+   "acceptance_criteria": ["Cenário: ...\n  Dado ...\n  Quando ...\n  Então ...", "..."],
+   "tasks": [{"title": "...", "description": "..."}]}]}
 """
 import html
 import json
@@ -15,7 +16,7 @@ from pathlib import Path
 
 import fitz
 
-_FIELDS = ("title", "description", "acceptance_criteria")
+_FIELDS = ("title", "description", "acceptance_criteria", "tasks")
 _CSS = """
 body { font-family: sans-serif; font-size: 10pt; }
 h1 { font-size: 16pt; margin-bottom: 14pt; }
@@ -44,6 +45,10 @@ def build_html(data: dict) -> str:
         parts.append(f"<p class='label'>Descrição</p><p>{_text(story['description'])}</p>")
         parts.append("<p class='label'>Critérios de aceite</p>")
         parts.extend(f"<p class='criterion'>{_text(c)}</p>" for c in story["acceptance_criteria"])
+        parts.append("<p class='label'>Tasks</p>")
+        for task in story["tasks"]:
+            detail = f" — {_text(task['description'])}" if task.get("description") else ""
+            parts.append(f"<p class='criterion'>• {_text(task['title'])}{detail}</p>")
     return "<body>" + "".join(parts) + "</body>"
 
 
