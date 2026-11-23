@@ -103,6 +103,10 @@ Toda história sai com suas **tasks** (de 2 a 6, sem estimativas). Um botão na 
 
 Cada área de negócio escreve a especificação num modelo próprio. O [padrão de especificação](docs/spec-standard.pt-BR.md) define uma estrutura única (AS IS/TO BE, sistemas, regras de negócio numeradas, critérios em Gherkin, retornos esperados, perguntas em aberto) que o pipeline agora gera, e a skill `po-spec-review` confere qualquer especificação contra ele: estrutura, contradições, lacunas, quebra em histórias INVEST e Gherkin. Instale para o Claude Code com `python -m scripts.install_skill` e peça ao Claude para rodar `/po-spec-review` em um arquivo de especificação.
 
+## Revisão local pelo Claude Code
+
+Se você tem assinatura do Claude e não quer usar chave de API, `python -m streamlit run spec_review_page.py` abre uma página local que roda a skill `po-spec-review` pelo seu login do Claude Code. Veja [docs/spec-review-page.pt-BR.md](docs/spec-review-page.pt-BR.md).
+
 ## Limitações
 
 - Os exemplos incluídos foram **escritos e curados à mão** para mostrar a saída pretendida; não são a transcrição de uma execução de modelo. Use `python -m scripts.generate_examples` para regenerá-los com um provedor real.
